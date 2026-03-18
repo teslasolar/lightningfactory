@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Room Monitor — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+canvas{width:100%;height:200px;border-radius:6px;background:#08080d;display:block;margin-bottom:1rem}
+#fftCanvas{height:250px}
+.start-btn{display:block;margin:0 auto;background:transparent;border:2px solid var(--brain);color:var(--brain);padding:.7rem 2rem;border-radius:6px;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s;letter-spacing:.1em}
+.start-btn:hover{background:rgba(0,200,220,.1)}
+.start-btn.active{border-color:var(--overlap);color:var(--overlap)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1.5rem 0}
+.stat{text-align:center;padding:1rem;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.stat .num{font-size:1.3rem;font-weight:700;color:var(--brain)}
+.stat .lbl{font-size:.7rem;color:var(--dim);margin-top:.3rem}
+.peak-list{font-size:.8rem;color:var(--dim);line-height:2}
+.peak-list .peak{display:flex;justify-content:space-between;border-bottom:1px solid rgba(30,30,46,.5);padding:.3rem 0}
+.peak-list .peak .freq{color:var(--text);font-weight:700}
+.peak-list .peak .mag{color:var(--grid)}
+.peak-list .peak .note{font-size:.7rem;color:var(--dim)}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}.info strong{color:var(--text)}
+.permission-msg{text-align:center;padding:2rem;color:var(--dim);font-size:.85rem}
+.permission-msg strong{color:var(--overlap)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#127908;</div>
+<h1>LIVE ROOM MONITOR</h1>
+<div class="sub">What frequency is YOUR room humming at?</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / Live Room Monitor</div>
+
+<div class="card">
+<h2>Microphone Input</h2>
+<div id="permissionArea">
+<button class="start-btn" id="startBtn">START LISTENING</button>
+<p style="text-align:center;margin-top:.8rem;font-size:.75rem;color:var(--dim)">Requires microphone access. Audio is processed locally — nothing leaves your device.</p>
+</div>
+</div>
+
+<div id="liveArea" style="display:none">
+<div class="card">
+<h2>Waveform</h2>
+<canvas id="waveCanvas"></canvas>
+</div>
+
+<div class="card">
+<h2>Frequency Spectrum (0–500 Hz)</h2>
+<canvas id="fftCanvas"></canvas>
+<div class="stats">
+<div class="stat"><div class="num" id="dominantFreq">—</div><div class="lbl">Dominant (Hz)</div></div>
+<div class="stat"><div class="num" id="gridDetect">—</div><div class="lbl">Grid frequency</div></div>
+<div class="stat"><div class="num" id="noiseFloor">—</div><div class="lbl">Noise floor (dB)</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Detected Peaks</h2>
+<div class="peak-list" id="peakList">Analyzing...</div>
+</div>
+</div>
+
+<div class="card">
+<h2>What You're Hearing</h2>
+<div class="info">
+<p>Every room has an acoustic signature. <strong>Transformers, fluorescent ballasts, refrigerators, HVAC systems</strong> — they all emit tones at the grid frequency or its harmonics.</p>
+<p>The fundamental hum is usually at <strong>100 or 120 Hz</strong> (double the grid frequency) because transformers vibrate at twice the electrical frequency due to the magnetic force being proportional to B&sup2;.</p>
+<br>
+<p>This tool uses your microphone to perform a <strong>real-time FFT</strong> (Fast Fourier Transform) and identify the dominant frequencies in your room. Look for spikes at:</p>
+<p>&bull; <strong>50/60 Hz</strong> — Direct grid hum (rare acoustically)</p>
+<p>&bull; <strong>100/120 Hz</strong> — Transformer vibration (most common)</p>
+<p>&bull; <strong>150/180 Hz</strong> — 3rd harmonic</p>
+<p>&bull; <strong>200/240 Hz</strong> — 4th harmonic</p>
+</div>
+</div>
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+let audioCtx,analyser,microphone,running=false;
+const startBtn=document.getElementById('startBtn');
+const liveArea=document.getElementById('liveArea');
+const waveCanvas=document.getElementById('waveCanvas'),wCtx=waveCanvas.getContext('2d');
+const fftCanvas=document.getElementById('fftCanvas'),fCtx=fftCanvas.getContext('2d');
+
+function resizeAll(){
+[waveCanvas,fftCanvas].forEach(c=>{c.width=c.clientWidth*2;c.height=c.clientHeight*2});
+}
+window.addEventListener('resize',resizeAll);
+
+startBtn.addEventListener('click',async()=>{
+if(running){
+microphone.getTracks().forEach(t=>t.stop());
+audioCtx.close();running=false;
+startBtn.textContent='START LISTENING';startBtn.classList.remove('active');
+liveArea.style.display='none';return;
+}
+try{
+const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=8192;
+analyser.smoothingTimeConstant=0.8;
+const source=audioCtx.createMediaStreamSource(stream);
+source.connect(analyser);
+microphone=stream;running=true;
+startBtn.textContent='STOP';startBtn.classList.add('active');
+liveArea.style.display='block';
+resizeAll();
+draw();
+}catch(e){
+document.getElementById('permissionArea').innerHTML='<div class="permission-msg"><strong>Microphone access denied.</strong><br>Enable microphone permission and reload.</div>';
+}
+});
+
+function draw(){
+if(!running)return;
+requestAnimationFrame(draw);
+
+const bufLen=analyser.frequencyBinCount;
+const timeData=new Uint8Array(bufLen);
+const freqData=new Float32Array(bufLen);
+analyser.getByteTimeDomainData(timeData);
+analyser.getFloatFrequencyData(freqData);
+
+const sampleRate=audioCtx.sampleRate;
+const binSize=sampleRate/analyser.fftSize;
+
+// waveform
+const ww=waveCanvas.width,wh=waveCanvas.height;
+wCtx.clearRect(0,0,ww,wh);
+wCtx.strokeStyle='var(--brain)';wCtx.lineWidth=2;
+wCtx.beginPath();
+const sliceW=ww/512;
+for(let i=0;i<512;i++){
+const v=timeData[i]/128;
+const y=(v*wh)/2;
+i===0?wCtx.moveTo(0,y):wCtx.lineTo(i*sliceW,y);
+}
+wCtx.stroke();
+
+// FFT - show 0-500Hz
+const fw=fftCanvas.width,fh=fftCanvas.height,fPad=40;
+fCtx.clearRect(0,0,fw,fh);
+const maxBin=Math.min(Math.ceil(500/binSize),bufLen);
+const barW=(fw-fPad*2)/maxBin;
+
+// find peaks
+let peaks=[];
+for(let i=2;i<maxBin-2;i++){
+if(freqData[i]>freqData[i-1]&&freqData[i]>freqData[i+1]&&freqData[i]>freqData[i-2]&&freqData[i]>freqData[i+2]&&freqData[i]>-60){
+peaks.push({bin:i,freq:(i*binSize).toFixed(1),mag:freqData[i].toFixed(1)});
+}
+}
+peaks.sort((a,b)=>b.mag-a.mag);
+peaks=peaks.slice(0,8);
+
+// draw bars
+for(let i=0;i<maxBin;i++){
+const db=freqData[i];
+const norm=Math.max(0,(db+100)/100);
+const barH=norm*(fh-fPad*2);
+const freq=i*binSize;
+const isGrid=(Math.abs(freq-50)<3||Math.abs(freq-60)<3||Math.abs(freq-100)<3||Math.abs(freq-120)<3);
+fCtx.fillStyle=isGrid?'var(--overlap)':'var(--grid)';
+fCtx.fillRect(fPad+i*barW,fh-fPad-barH,Math.max(barW-1,1),barH);
+}
+
+// freq labels
+fCtx.fillStyle='var(--dim)';fCtx.font=(10*2)+'px Space Mono';fCtx.textAlign='center';
+[0,50,60,100,120,150,180,200,250,300,400,500].forEach(f=>{
+if(f<=500){
+const x=fPad+(f/binSize)*barW;
+fCtx.fillText(f+'',x,fh-fPad+28);
+}
+});
+fCtx.strokeStyle='var(--border)';fCtx.lineWidth=1;
+fCtx.beginPath();fCtx.moveTo(fPad,fh-fPad);fCtx.lineTo(fw-fPad,fh-fPad);fCtx.stroke();
+
+// stats
+if(peaks.length>0){
+document.getElementById('dominantFreq').textContent=peaks[0].freq;
+const gridPeak=peaks.find(p=>{const f=parseFloat(p.freq);return(Math.abs(f-50)<5||Math.abs(f-60)<5||Math.abs(f-100)<5||Math.abs(f-120)<5)});
+document.getElementById('gridDetect').textContent=gridPeak?gridPeak.freq+' Hz':'None';
+document.getElementById('gridDetect').style.color=gridPeak?'var(--overlap)':'var(--safe)';
+}
+
+// noise floor
+let floor=0;for(let i=0;i<maxBin;i++)floor+=freqData[i];
+floor/=maxBin;
+document.getElementById('noiseFloor').textContent=floor.toFixed(0);
+
+// peak list
+const peakList=document.getElementById('peakList');
+if(peaks.length===0){peakList.innerHTML='No significant peaks detected';return;}
+let html='';
+peaks.forEach(p=>{
+const f=parseFloat(p.freq);
+let note='';
+if(Math.abs(f-50)<3)note='50Hz grid fundamental';
+else if(Math.abs(f-60)<3)note='60Hz grid fundamental';
+else if(Math.abs(f-100)<3)note='100Hz (2nd harmonic of 50Hz)';
+else if(Math.abs(f-120)<3)note='120Hz (2nd harmonic of 60Hz)';
+else if(Math.abs(f-150)<4)note='3rd harmonic of 50Hz';
+else if(Math.abs(f-180)<4)note='3rd harmonic of 60Hz';
+else if(Math.abs(f-200)<4)note='4th harmonic of 50Hz';
+else if(Math.abs(f-240)<4)note='4th harmonic of 60Hz';
+html+=`<div class="peak"><span class="freq">${p.freq} Hz</span><span class="mag">${p.mag} dB</span><span class="note">${note}</span></div>`;
+});
+peakList.innerHTML=html;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Frequency Map — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.country{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;transition:border-color .2s;cursor:default}
+.country:hover{border-color:var(--brain)}
+.country .name{color:var(--text)}
+.country .freq{font-weight:700;font-size:.9rem}
+.country .freq.hz50{color:#6C8EBF}
+.country .freq.hz60{color:var(--grid)}
+.country .freq.both{color:var(--overlap)}
+.filter{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter button{background:var(--bg);color:var(--dim);border:1px solid var(--border);border-radius:4px;padding:.4rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s}
+.filter button:hover,.filter button.active{border-color:var(--brain);color:var(--brain)}
+.compare-box{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.compare-side{background:var(--bg);border-radius:8px;border:1px solid var(--border);padding:1.2rem;text-align:center}
+.compare-side h3{font-size:1.4rem;margin-bottom:.8rem}
+.compare-side .detail{font-size:.78rem;color:var(--dim);text-align:left;line-height:1.8}
+.compare-side .detail strong{color:var(--text)}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}.info strong{color:var(--text)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.map-grid{grid-template-columns:1fr}.compare-box{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#128506;</div>
+<h1>WORLD FREQUENCY MAP</h1>
+<div class="sub">50 Hz or 60 Hz? Depends where you are</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / World Frequency Map</div>
+
+<div class="card">
+<h2>50 Hz vs 60 Hz</h2>
+<div class="compare-box">
+<div class="compare-side" style="border-color:#6C8EBF">
+<h3 style="color:#6C8EBF">50 Hz</h3>
+<div class="detail">
+<p><strong>Regions:</strong> Europe, Asia, Africa, Australia, most of South America</p><br>
+<p><strong>Population:</strong> ~5.5 billion people</p><br>
+<p><strong>Voltage:</strong> Typically 220–240V</p><br>
+<p><strong>Key harmonics in gamma:</strong> 50 Hz (fundamental) sits right in the gamma band</p><br>
+<p><strong>3rd harmonic:</strong> 150 Hz</p>
+</div>
+</div>
+<div class="compare-side" style="border-color:var(--grid)">
+<h3 style="color:var(--grid)">60 Hz</h3>
+<div class="detail">
+<p><strong>Regions:</strong> North America, parts of South America, Japan (east), South Korea, Saudi Arabia</p><br>
+<p><strong>Population:</strong> ~2.5 billion people</p><br>
+<p><strong>Voltage:</strong> Typically 110–120V</p><br>
+<p><strong>Key harmonics in gamma:</strong> 60 Hz (fundamental) sits in gamma band</p><br>
+<p><strong>3rd harmonic:</strong> 180 Hz</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Country Directory</h2>
+<div class="filter">
+<button class="active" data-filter="all">All</button>
+<button data-filter="50">50 Hz only</button>
+<button data-filter="60">60 Hz only</button>
+<button data-filter="both">Both</button>
+</div>
+<div class="map-grid" id="countryGrid"></div>
+</div>
+
+<div class="card">
+<h2>The Japan Split</h2>
+<div class="info">
+<p>Japan is the only major country that runs <strong>both frequencies simultaneously</strong>. In 1895, Tokyo bought <strong>50 Hz German generators</strong>, while Osaka bought <strong>60 Hz American generators</strong>. The country never unified.</p>
+<br>
+<p>Today, the Itoigawa-Shizuoka line divides Japan: <strong>eastern Japan</strong> (including Tokyo) runs at <strong>50 Hz</strong>, and <strong>western Japan</strong> (including Osaka) runs at <strong>60 Hz</strong>. Frequency converter stations link the two grids with limited capacity.</p>
+<br>
+<p>This means people in Tokyo and Osaka have <strong>different EMF exposure profiles</strong> from their power grid — a natural experiment that has never been studied for cognitive effects.</p>
+</div>
+</div>
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+const countries=[
+{name:'United States',freq:60},{name:'Canada',freq:60},{name:'Mexico',freq:60},
+{name:'Brazil',freq:60},{name:'Argentina',freq:50},{name:'Colombia',freq:60},
+{name:'Chile',freq:50},{name:'Peru',freq:60},{name:'Venezuela',freq:60},
+{name:'United Kingdom',freq:50},{name:'Germany',freq:50},{name:'France',freq:50},
+{name:'Italy',freq:50},{name:'Spain',freq:50},{name:'Netherlands',freq:50},
+{name:'Sweden',freq:50},{name:'Norway',freq:50},{name:'Switzerland',freq:50},
+{name:'Poland',freq:50},{name:'Russia',freq:50},
+{name:'China',freq:50},{name:'India',freq:50},{name:'Japan',freq:'both'},
+{name:'South Korea',freq:60},{name:'Indonesia',freq:50},{name:'Thailand',freq:50},
+{name:'Vietnam',freq:50},{name:'Philippines',freq:60},{name:'Taiwan',freq:60},
+{name:'Australia',freq:50},{name:'New Zealand',freq:50},
+{name:'Nigeria',freq:50},{name:'South Africa',freq:50},{name:'Egypt',freq:50},
+{name:'Kenya',freq:50},{name:'Ghana',freq:50},
+{name:'Saudi Arabia',freq:60},{name:'UAE',freq:50},{name:'Israel',freq:50},
+{name:'Turkey',freq:50},{name:'Iran',freq:50}
+];
+
+const grid=document.getElementById('countryGrid');
+const filterBtns=document.querySelectorAll('.filter button');
+
+function render(filter){
+grid.innerHTML='';
+countries.filter(c=>{
+if(filter==='all')return true;
+if(filter==='both')return c.freq==='both';
+return c.freq==parseInt(filter);
+}).forEach(c=>{
+const div=document.createElement('div');div.className='country';
+const cls=c.freq==='both'?'both':c.freq===50?'hz50':'hz60';
+const label=c.freq==='both'?'50/60':c.freq+' Hz';
+div.innerHTML=`<span class="name">${c.name}</span><span class="freq ${cls}">${label}</span>`;
+grid.appendChild(div);
+});
+}
+
+filterBtns.forEach(btn=>{
+btn.addEventListener('click',()=>{
+filterBtns.forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+render(btn.dataset.filter);
+});
+});
+
+render('all');
+</script>
+</body>
+</html>

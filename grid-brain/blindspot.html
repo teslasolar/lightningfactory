@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Blind Spot — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+.card h2 .num{color:var(--grid);margin-right:.5rem}
+.quote{border-left:3px solid var(--grid);padding:.8rem 1.2rem;margin:1rem 0;background:rgba(220,160,48,.05);font-size:.85rem;font-style:italic;color:var(--dim)}
+.quote cite{display:block;margin-top:.5rem;font-style:normal;font-size:.75rem;color:var(--grid)}
+.info{font-size:.85rem;color:var(--dim);line-height:1.8}.info strong{color:var(--text)}
+.info p+p{margin-top:.8rem}
+.callout{background:rgba(204,51,51,.08);border:1px solid rgba(204,51,51,.25);border-radius:6px;padding:1rem 1.2rem;margin:1rem 0;font-size:.82rem;color:var(--dim)}
+.callout strong{color:var(--overlap)}
+.timeline{border-left:2px solid var(--border);margin:1rem 0 1rem 1rem;padding-left:1.5rem}
+.timeline .event{margin-bottom:1.2rem;position:relative}
+.timeline .event::before{content:'';position:absolute;left:-1.85rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--grid);border:2px solid var(--bg)}
+.timeline .event .year{font-size:.75rem;color:var(--grid);font-weight:700;letter-spacing:.1em}
+.timeline .event .desc{font-size:.8rem;color:var(--dim);margin-top:.2rem}
+.timeline .event .desc strong{color:var(--text)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#128269;</div>
+<h1>THE BLIND SPOT</h1>
+<div class="sub">Why neuroscience can't see this</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / The Blind Spot</div>
+
+<div class="card">
+<h2><span class="num">01</span>The Problem</h2>
+<div class="info">
+<p>Every EEG lab in the world runs on grid power. Every brain scan happens inside a building filled with <strong>50 or 60 Hz electromagnetic fields</strong>. And what do researchers do with the 50/60 Hz signal in their data?</p>
+<p><strong>They filter it out.</strong></p>
+<p>A "notch filter" at the local grid frequency is standard practice in every EEG system. It's considered artifact removal — cleaning up the signal. But this creates a fundamental blind spot: if the brain's activity at exactly the grid frequency <em>is</em> being influenced by the grid, the notch filter removes the evidence.</p>
+</div>
+</div>
+
+<div class="card">
+<h2><span class="num">02</span>The Notch Filter</h2>
+<div class="info">
+<p>EEG amplifiers pick up electrical noise from the environment. The largest source is the power grid — a strong, stable signal at exactly 50 or 60 Hz. To see the brain's "real" signals, researchers apply a <strong>notch filter</strong> that removes a narrow band around the grid frequency.</p>
+<p>This is completely reasonable from an engineering perspective. The grid signal is orders of magnitude stronger than the brain signal at that frequency. Without the filter, it would dominate the recording.</p>
+</div>
+<div class="callout">
+<strong>The catch:</strong> A notch filter can't distinguish between grid noise picked up by the electrodes and actual neural activity at the same frequency. If the brain oscillates at 50 or 60 Hz — whether spontaneously or in response to the ambient field — that activity gets deleted along with the noise.
+</div>
+</div>
+
+<div class="card">
+<h2><span class="num">03</span>What We Can't Measure</h2>
+<div class="info">
+<p>This creates several blind spots in neuroscience:</p>
+<p><strong>1. Entrainment:</strong> If neural oscillations entrain (synchronize) to the grid frequency, the notch filter removes the evidence. We literally cannot detect brain-grid coupling with standard EEG methods.</p>
+<p><strong>2. Baseline shifts:</strong> If constant grid exposure shifts the brain's baseline activity at 50/60 Hz, every experiment ever conducted has been done with this shift already present — it looks "normal" because we've never measured a brain without it.</p>
+<p><strong>3. Cross-frequency effects:</strong> The grid's harmonics (100, 120, 150, 180 Hz...) could affect higher brain rhythms. These are typically filtered out as well.</p>
+</div>
+</div>
+
+<div class="card">
+<h2><span class="num">04</span>Historical Context</h2>
+<div class="timeline">
+<div class="event"><div class="year">1882</div><div class="desc"><strong>Edison's Pearl Street Station</strong> begins delivering DC power. No frequency to interfere with.</div></div>
+<div class="event"><div class="year">1893</div><div class="desc"><strong>Westinghouse/Tesla AC system</strong> wins the "War of Currents." 60 Hz becomes the American standard.</div></div>
+<div class="event"><div class="year">1924</div><div class="desc"><strong>Hans Berger</strong> records the first human EEG. Grid power is already widespread in Germany (50 Hz). The notch filter problem begins.</div></div>
+<div class="event"><div class="year">1930s</div><div class="desc"><strong>Gamma waves</strong> (30–100 Hz) are first described — a frequency range that includes the grid fundamental.</div></div>
+<div class="event"><div class="year">1990s</div><div class="desc"><strong>Gamma binding hypothesis</strong> emerges — 40 Hz oscillations linked to consciousness, attention, memory. Studies use notch filters at 50/60 Hz.</div></div>
+<div class="event"><div class="year">2004</div><div class="desc"><strong>Lutz et al.</strong> find enhanced gamma synchrony in meditators at ~40 Hz. The 50/60 Hz notch is already applied.</div></div>
+<div class="event"><div class="year">Present</div><div class="desc">The notch filter remains <strong>universal practice</strong>. No major study has been conducted in a grid-free (Faraday cage) environment to compare.</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2><span class="num">05</span>What Would It Take?</h2>
+<div class="info">
+<p>To actually test whether the grid affects brain activity, you'd need:</p>
+<p><strong>1. A shielded room</strong> — a Faraday cage that blocks external EMF, with battery-powered EEG equipment inside.</p>
+<p><strong>2. Comparison recordings</strong> — same subjects, same tasks, with and without grid-frequency fields present.</p>
+<p><strong>3. No notch filter</strong> — record the raw signal and use spatial filtering (like beamforming) to separate brain sources from environmental sources.</p>
+<p>This experiment is entirely feasible. It hasn't been done because the assumption that the grid is "just noise" is so deeply embedded in the field that questioning it doesn't occur to most researchers.</p>
+</div>
+<div class="quote">
+"The greatest obstacle to discovery is not ignorance — it is the illusion of knowledge."
+<cite>— Daniel J. Boorstin</cite>
+</div>
+</div>
+
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+</body>
+</html>

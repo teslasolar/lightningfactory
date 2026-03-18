@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exposure Estimator — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+canvas{width:100%;height:280px;border-radius:6px;background:#08080d;display:block;margin-bottom:1rem}
+.timeline{display:flex;flex-direction:column;gap:.6rem}
+.slot{display:flex;align-items:center;gap:.8rem;font-size:.8rem}
+.slot label{width:100px;color:var(--dim);flex-shrink:0;font-size:.75rem}
+.slot select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:.3rem .5rem;font-family:inherit;font-size:.78rem;flex:1}
+.slot .hours{width:55px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:.3rem;font-family:inherit;font-size:.78rem;text-align:center}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1.5rem;text-align:center;margin:1rem 0}
+.result-box .value{font-size:1.8rem;font-weight:700;color:var(--grid);margin:.3rem 0}
+.result-box .label{font-size:.8rem;color:var(--dim)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem}
+.stat{text-align:center;padding:1rem;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.stat .num{font-size:1.2rem;font-weight:700;color:var(--brain)}
+.stat .lbl{font-size:.7rem;color:var(--dim);margin-top:.3rem}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}.info strong{color:var(--text)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.stats{grid-template-columns:1fr}.slot{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#127968;</div>
+<h1>EXPOSURE ESTIMATOR</h1>
+<div class="sub">What's your 24-hour EMF profile?</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / Exposure Estimator</div>
+
+<div class="card">
+<h2>Your Typical Day</h2>
+<div class="timeline" id="timeline"></div>
+</div>
+
+<div class="card">
+<h2>24-Hour Exposure Profile</h2>
+<canvas id="chart"></canvas>
+<div class="stats">
+<div class="stat"><div class="num" id="avgField">—</div><div class="lbl">Avg field (&#181;T)</div></div>
+<div class="stat"><div class="num" id="peakField">—</div><div class="lbl">Peak field (&#181;T)</div></div>
+<div class="stat"><div class="num" id="totalDose">—</div><div class="lbl">Dose (&#181;T&middot;hr)</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Context</h2>
+<div class="info">
+<p>The <strong>ICNIRP guideline</strong> for general public exposure at 50/60 Hz is <strong>200 &#181;T</strong> (microtesla). Typical home background is <strong>0.01–0.2 &#181;T</strong>.</p>
+<br>
+<p>This estimator models your daily magnetic field exposure based on where you spend time and what appliances surround you. The "dose" (field &times; time) is a rough proxy — regulatory limits are based on instantaneous field strength, not cumulative dose.</p>
+</div>
+</div>
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+const environments=[
+{name:'Sleeping (bedroom)',field:0.05},
+{name:'Kitchen (cooking)',field:0.8},
+{name:'Home office (computer)',field:0.15},
+{name:'Living room (TV/couch)',field:0.1},
+{name:'Commute (train/subway)',field:1.5},
+{name:'Commute (car)',field:0.2},
+{name:'Office (desk)',field:0.3},
+{name:'Office (server room)',field:2.0},
+{name:'Factory floor',field:5.0},
+{name:'Gym',field:0.4},
+{name:'Outdoors (park)',field:0.02},
+{name:'Near power line',field:3.0},
+{name:'Bathroom',field:0.3},
+{name:'Shopping mall',field:0.5}
+];
+
+const defaultDay=[
+{env:0,hours:8},{env:12,hours:0.5},{env:1,hours:1},{env:5,hours:0.5},
+{env:6,hours:8},{env:5,hours:0.5},{env:1,hours:1},{env:3,hours:3},{env:0,hours:0.5}
+];
+
+const timelineEl=document.getElementById('timeline');
+const canvas=document.getElementById('chart'),ctx=canvas.getContext('2d');
+
+// build timeline slots
+const slots=[];
+const labels=['Sleep','Morning','Breakfast','Commute AM','Work','Commute PM','Dinner','Evening','Wind down'];
+defaultDay.forEach((d,i)=>{
+const div=document.createElement('div');div.className='slot';
+const optHtml=environments.map((e,j)=>`<option value="${j}" ${j===d.env?'selected':''}>${e.name} (${e.field} µT)</option>`).join('');
+div.innerHTML=`<label>${labels[i]}</label><select>${optHtml}</select><input type="number" class="hours" value="${d.hours}" min="0" max="24" step="0.5"> hr`;
+timelineEl.appendChild(div);
+slots.push({sel:div.querySelector('select'),hrs:div.querySelector('.hours')});
+});
+
+function resize(){canvas.width=canvas.clientWidth*2;canvas.height=canvas.clientHeight*2}
+window.addEventListener('resize',resize);resize();
+
+function calc(){
+const w=canvas.width,h=canvas.height,pad=50;
+ctx.clearRect(0,0,w,h);
+
+let segments=[],totalHrs=0;
+slots.forEach(s=>{
+const envIdx=parseInt(s.sel.value);
+const hrs=parseFloat(s.hrs.value)||0;
+segments.push({field:environments[envIdx].field,hours:hrs,name:environments[envIdx].name});
+totalHrs+=hrs;
+});
+
+if(totalHrs===0)return;
+
+// draw bar chart over time
+let x=pad,maxField=Math.max(...segments.map(s=>s.field),1);
+const chartW=w-pad*2,chartH=h-pad*2;
+
+segments.forEach(seg=>{
+const barW=(seg.hours/totalHrs)*chartW;
+const barH=(seg.field/maxField)*chartH;
+const color=seg.field<0.1?'var(--safe)':seg.field<1?'var(--grid)':'var(--overlap)';
+ctx.fillStyle=color;
+ctx.fillRect(x,h-pad-barH,barW-2,barH);
+
+if(barW>40){
+ctx.fillStyle='var(--text)';ctx.font=(9*2)+'px Space Mono';ctx.textAlign='center';
+ctx.fillText(seg.field+'µT',x+barW/2,h-pad-barH-10);
+ctx.fillStyle='var(--dim)';ctx.font=(8*2)+'px Space Mono';
+ctx.fillText(seg.hours+'h',x+barW/2,h-pad+24);
+}
+x+=barW;
+});
+
+// axis
+ctx.strokeStyle='var(--border)';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+
+// stats
+let totalDose=0,peak=0,weightedSum=0;
+segments.forEach(s=>{totalDose+=s.field*s.hours;if(s.field>peak)peak=s.field;weightedSum+=s.field*s.hours;});
+const avg=totalHrs>0?weightedSum/totalHrs:0;
+
+document.getElementById('avgField').textContent=avg.toFixed(3);
+document.getElementById('peakField').textContent=peak.toFixed(2);
+document.getElementById('totalDose').textContent=totalDose.toFixed(2);
+}
+
+timelineEl.addEventListener('input',calc);
+calc();
+</script>
+</body>
+</html>

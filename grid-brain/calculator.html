@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Current Calculator — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+.form-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:end}
+.field{display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:180px}
+.field label{font-size:.75rem;color:var(--dim);letter-spacing:.05em}
+.field input,.field select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:.5rem .7rem;font-family:inherit;font-size:.85rem}
+.field input:focus,.field select:focus{outline:none;border-color:var(--brain)}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1.5rem;text-align:center;margin:1.5rem 0}
+.result-box .value{font-size:2rem;font-weight:700;color:var(--grid);margin:.5rem 0}
+.result-box .unit{font-size:.9rem;color:var(--dim)}
+.result-box .label{font-size:.8rem;color:var(--dim);margin-bottom:.5rem}
+.meter{height:8px;background:var(--bg);border-radius:4px;margin:1rem 0;overflow:hidden;border:1px solid var(--border)}
+.meter-fill{height:100%;border-radius:4px;transition:width .5s,background .5s}
+.scale{display:flex;justify-content:space-between;font-size:.7rem;color:var(--dim)}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}
+.info strong{color:var(--text)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.form-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#128208;</div>
+<h1>CURRENT CALCULATOR</h1>
+<div class="sub">How much current does the grid induce in you?</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / Current Calculator</div>
+
+<div class="card">
+<h2>Your Environment</h2>
+<div class="form-row">
+<div class="field">
+<label>Distance from power line (m)</label>
+<input type="number" id="distance" value="10" min="0.1" max="1000" step="0.1">
+</div>
+<div class="field">
+<label>Line voltage (kV)</label>
+<select id="voltage">
+<option value="0.24">240V — Household</option>
+<option value="11">11kV — Street distribution</option>
+<option value="33">33kV — Sub-transmission</option>
+<option value="115">115kV — Transmission</option>
+<option value="230">230kV — High voltage</option>
+<option value="500" selected>500kV — Extra high voltage</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="field">
+<label>Grid frequency</label>
+<select id="gridFreq"><option value="50">50 Hz</option><option value="60" selected>60 Hz</option></select>
+</div>
+<div class="field">
+<label>Line current (A)</label>
+<input type="number" id="lineCurrent" value="500" min="1" max="5000" step="10">
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Induced Current in Your Body</h2>
+<div class="result-box">
+<div class="label">Estimated induced body current</div>
+<div class="value" id="resultValue">—</div>
+<div class="unit" id="resultUnit">microamps (&#181;A)</div>
+</div>
+<div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+<div class="scale">
+<span>0 &#181;A</span>
+<span>Perception ~500 &#181;A</span>
+<span>ICNIRP limit ~2 mA</span>
+</div>
+<div id="verdict" style="text-align:center;margin:1rem 0;font-size:.85rem"></div>
+</div>
+
+<div class="card">
+<h2>How This Works</h2>
+<div class="info">
+<p>An AC power line creates a <strong>time-varying magnetic field</strong> around it. By Faraday's law, this changing field induces an electric field in any conductive loop — including your body.</p>
+<br>
+<p>The induced current depends on:</p>
+<br>
+<p>&bull; <strong>Magnetic field strength</strong> — falls off as 1/r from the line</p>
+<p>&bull; <strong>Body cross-section</strong> — modeled as ~0.1 m&sup2; loop area</p>
+<p>&bull; <strong>Body impedance</strong> — roughly 500&#8486; at power-line frequencies</p>
+<p>&bull; <strong>Frequency</strong> — higher frequency = more induced EMF</p>
+<br>
+<p>The magnetic field from a long straight conductor: <strong>B = &#181;&#8320;I / (2&#960;r)</strong></p>
+<p>Induced EMF: <strong>V = 2&#960;f &middot; B &middot; A</strong></p>
+<p>Body current: <strong>I = V / Z</strong></p>
+</div>
+</div>
+
+</div>
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+const distIn=document.getElementById('distance'),voltIn=document.getElementById('voltage'),
+freqIn=document.getElementById('gridFreq'),currentIn=document.getElementById('lineCurrent'),
+resultVal=document.getElementById('resultValue'),meterFill=document.getElementById('meterFill'),
+verdict=document.getElementById('verdict');
+
+const mu0=4*Math.PI*1e-7;
+const bodyArea=0.1; // m^2 loop
+const bodyZ=500; // ohms
+
+function calc(){
+const r=parseFloat(distIn.value)||10;
+const f=parseInt(freqIn.value);
+const I=parseFloat(currentIn.value)||500;
+
+const B=mu0*I/(2*Math.PI*r);
+const emf=2*Math.PI*f*B*bodyArea;
+const bodyI=emf/bodyZ;
+const uA=bodyI*1e6;
+
+if(uA<1){resultVal.textContent=uA.toFixed(3);}
+else if(uA<100){resultVal.textContent=uA.toFixed(2);}
+else if(uA<10000){resultVal.textContent=uA.toFixed(1);}
+else{resultVal.textContent=(uA/1000).toFixed(2);document.getElementById('resultUnit').textContent='milliamps (mA)';}
+if(uA<10000)document.getElementById('resultUnit').textContent='microamps (\u00B5A)';
+
+// meter — scale to 2000 uA = 100%
+const pct=Math.min(uA/2000*100,100);
+meterFill.style.width=pct+'%';
+if(uA<100){meterFill.style.background='var(--safe)';verdict.innerHTML='<span style="color:var(--safe)">Well below perception threshold. Typical background exposure.</span>';}
+else if(uA<500){meterFill.style.background='var(--grid)';verdict.innerHTML='<span style="color:var(--grid)">Approaching perception threshold. Still within safety limits.</span>';}
+else if(uA<2000){meterFill.style.background='var(--overlap)';verdict.innerHTML='<span style="color:var(--overlap)">Above perception threshold. Near occupational exposure limits.</span>';}
+else{meterFill.style.background='#ff3333';verdict.innerHTML='<span style="color:#ff3333">Exceeds ICNIRP general public reference level.</span>';}
+}
+
+[distIn,voltIn,freqIn,currentIn].forEach(el=>el.addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>

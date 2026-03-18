@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frequency Overlap — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+canvas{width:100%;height:300px;border-radius:6px;background:#08080d;display:block;margin-bottom:1rem}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.controls label{font-size:.8rem;color:var(--dim)}
+.controls select,.controls input[type=range]{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:.3rem .5rem;font-family:inherit;font-size:.8rem}
+.controls input[type=range]{width:120px}
+.legend{display:flex;gap:1.5rem;font-size:.75rem;margin-top:.5rem;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:.4rem}
+.legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}
+.info strong{color:var(--text)}
+.overlap-zone{background:rgba(204,51,51,.1);border:1px solid rgba(204,51,51,.3);border-radius:6px;padding:1rem;margin:1rem 0;font-size:.8rem}
+.overlap-zone h3{color:var(--overlap);font-size:.85rem;margin-bottom:.5rem}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.controls{flex-direction:column}canvas{height:220px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#128268;</div>
+<h1>FREQUENCY OVERLAP</h1>
+<div class="sub">Where the power grid meets your gamma waves</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / Frequency Overlap</div>
+
+<div class="card">
+<h2>Spectrum Visualizer</h2>
+<canvas id="spectrum"></canvas>
+<div class="controls">
+<label>Grid: <select id="gridFreq"><option value="50">50 Hz (EU/Asia)</option><option value="60" selected>60 Hz (Americas)</option></select></label>
+<label>Harmonics: <input type="range" id="harmonicCount" min="1" max="12" value="6"> <span id="harmonicVal">6</span></label>
+<label>Brainwave intensity: <input type="range" id="brainIntensity" min="1" max="10" value="5"> <span id="brainVal">5</span></label>
+</div>
+<div class="legend">
+<span><span class="dot" style="background:var(--grid)"></span> Grid harmonics</span>
+<span><span class="dot" style="background:var(--brain)"></span> Brainwaves</span>
+<span><span class="dot" style="background:var(--overlap)"></span> Overlap zones</span>
+</div>
+</div>
+
+<div class="card">
+<h2>Overlap Analysis</h2>
+<div id="analysis" class="info"></div>
+</div>
+
+<div class="card">
+<h2>What's Happening</h2>
+<div class="info">
+<p>Power grids operate at <strong>50 Hz or 60 Hz</strong>, but they don't just produce a clean sine wave. Every wire, transformer, and appliance generates <strong>harmonics</strong> — multiples of the base frequency.</p>
+<br>
+<p>Your brain produces electrical oscillations in named bands:</p>
+<br>
+<p><strong>Delta</strong> (0.5–4 Hz) &middot; <strong>Theta</strong> (4–8 Hz) &middot; <strong>Alpha</strong> (8–13 Hz) &middot; <strong>Beta</strong> (13–30 Hz) &middot; <strong>Gamma</strong> (30–100 Hz)</p>
+<br>
+<p>The <strong>gamma band</strong> (30–100 Hz) is where your brain's frequencies overlap with the grid's fundamental and lower harmonics. This tool shows you exactly where those overlaps occur.</p>
+</div>
+</div>
+
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+const canvas=document.getElementById('spectrum'),ctx=canvas.getContext('2d');
+const gridFreqSel=document.getElementById('gridFreq'),harmonicSlider=document.getElementById('harmonicCount'),brainSlider=document.getElementById('brainIntensity');
+const harmonicValEl=document.getElementById('harmonicVal'),brainValEl=document.getElementById('brainVal');
+const analysisEl=document.getElementById('analysis');
+
+const brainBands=[
+{name:'Delta',lo:0.5,hi:4,color:'rgba(160,120,255,.4)'},
+{name:'Theta',lo:4,hi:8,color:'rgba(100,160,255,.4)'},
+{name:'Alpha',lo:8,hi:13,color:'rgba(50,200,180,.4)'},
+{name:'Beta',lo:13,hi:30,color:'rgba(0,200,220,.5)'},
+{name:'Gamma',lo:30,hi:100,color:'rgba(0,200,220,.7)'}
+];
+
+function resize(){canvas.width=canvas.clientWidth*2;canvas.height=canvas.clientHeight*2}
+window.addEventListener('resize',resize);resize();
+
+function draw(){
+const w=canvas.width,h=canvas.height,pad=60;
+const gridF=parseInt(gridFreqSel.value);
+const nHarm=parseInt(harmonicSlider.value);
+const brainInt=parseInt(brainSlider.value)/10;
+const maxFreq=gridF*nHarm+40;
+harmonicValEl.textContent=nHarm;brainValEl.textContent=brainSlider.value;
+ctx.clearRect(0,0,w,h);
+
+// x-axis mapping
+const xOf=f=>(f/maxFreq)*(w-pad*2)+pad;
+const yBase=h-pad;
+
+// draw brain bands
+brainBands.forEach(b=>{
+if(b.hi>maxFreq&&b.lo>maxFreq)return;
+const x1=xOf(Math.max(b.lo,0)),x2=xOf(Math.min(b.hi,maxFreq));
+ctx.fillStyle=b.color;
+ctx.globalAlpha=brainInt*.5;
+ctx.fillRect(x1,pad,x2-x1,yBase-pad);
+ctx.globalAlpha=1;
+ctx.fillStyle='rgba(255,255,255,.6)';
+ctx.font=(12*2)+'px Space Mono';
+ctx.textAlign='center';
+if(x2>x1+30)ctx.fillText(b.name,(x1+x2)/2,pad+24);
+});
+
+// draw grid harmonics
+const overlaps=[];
+for(let n=1;n<=nHarm;n++){
+const f=gridF*n;
+if(f>maxFreq)break;
+const x=xOf(f);
+const amp=(1/n)*(yBase-pad-20);
+
+// check overlap with brain bands
+let inBrain=brainBands.find(b=>f>=b.lo&&f<=b.hi);
+if(inBrain){overlaps.push({harmonic:n,freq:f,band:inBrain.name});ctx.strokeStyle='var(--overlap)';ctx.lineWidth=4;}
+else{ctx.strokeStyle='var(--grid)';ctx.lineWidth=2;}
+
+ctx.beginPath();ctx.moveTo(x,yBase);ctx.lineTo(x,yBase-amp);ctx.stroke();
+ctx.fillStyle=inBrain?'var(--overlap)':'var(--grid)';
+ctx.font='bold '+(11*2)+'px Space Mono';
+ctx.textAlign='center';
+ctx.fillText(f+'Hz',x,yBase-amp-10);
+ctx.font=(10*2)+'px Space Mono';
+ctx.fillStyle='var(--dim)';
+ctx.fillText('H'+n,x,yBase+28);
+}
+
+// axes
+ctx.strokeStyle='var(--border)';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(pad,yBase);ctx.lineTo(w-pad,yBase);ctx.stroke();
+ctx.fillStyle='var(--dim)';ctx.font=(11*2)+'px Space Mono';ctx.textAlign='center';
+ctx.fillText('Frequency (Hz)',w/2,h-8);
+
+// analysis
+if(overlaps.length===0){
+analysisEl.innerHTML='<p style="color:var(--safe)">No overlap detected at these settings. Grid harmonics fall outside brainwave bands.</p>';
+}else{
+let html='<div class="overlap-zone"><h3>'+overlaps.length+' Overlap Zone'+(overlaps.length>1?'s':'')+'</h3>';
+overlaps.forEach(o=>{html+='<p><strong>'+o.freq+' Hz</strong> (harmonic #'+o.harmonic+') falls inside the <strong>'+o.band+'</strong> band.</p>';});
+html+='</div><p style="margin-top:.8rem">These frequencies are where grid-generated electromagnetic fields share the same frequency as your neural oscillations. Whether this coupling has measurable cognitive effects is an open research question.</p>';
+analysisEl.innerHTML=html;
+}
+}
+
+[gridFreqSel,harmonicSlider,brainSlider].forEach(el=>el.addEventListener('input',draw));
+draw();
+</script>
+</body>
+</html>

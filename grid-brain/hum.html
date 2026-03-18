@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>55Hz Hum Generator — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+.tone-controls{display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding:1rem 0}
+.play-btn{width:100px;height:100px;border-radius:50%;border:3px solid var(--brain);background:transparent;color:var(--brain);font-size:2.5rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.play-btn:hover{background:rgba(0,200,220,.1);transform:scale(1.05)}
+.play-btn.active{border-color:var(--overlap);color:var(--overlap);background:rgba(204,51,51,.1);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,200,220,.3)}50%{box-shadow:0 0 20px 10px rgba(0,200,220,.1)}}
+.freq-display{font-size:2rem;font-weight:700;color:var(--grid);text-align:center}
+.freq-display .unit{font-size:.9rem;color:var(--dim);font-weight:400}
+.slider-row{display:flex;align-items:center;gap:1rem;width:100%;max-width:500px}
+.slider-row label{font-size:.75rem;color:var(--dim);width:80px;flex-shrink:0}
+.slider-row input[type=range]{flex:1;accent-color:var(--brain)}
+.slider-row .val{font-size:.8rem;color:var(--text);width:50px;text-align:right}
+canvas{width:100%;height:120px;border-radius:6px;background:#08080d;display:block}
+.presets{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+.presets button{background:var(--bg);color:var(--dim);border:1px solid var(--border);border-radius:4px;padding:.4rem .8rem;font-family:inherit;font-size:.75rem;cursor:pointer;transition:all .2s}
+.presets button:hover,.presets button.active{border-color:var(--brain);color:var(--brain)}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}.info strong{color:var(--text)}
+.warning{background:rgba(220,160,48,.08);border:1px solid rgba(220,160,48,.25);border-radius:6px;padding:.8rem 1rem;margin:1rem 0;font-size:.78rem;color:var(--dim)}
+.warning strong{color:var(--grid)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#127925;</div>
+<h1>55Hz HUM GENERATOR</h1>
+<div class="sub">Your frequency, not the grid's</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / 55Hz Hum Generator</div>
+
+<div class="card">
+<h2>Tone Generator</h2>
+<div class="tone-controls">
+<div class="freq-display"><span id="freqDisplay">55.00</span> <span class="unit">Hz</span></div>
+<button class="play-btn" id="playBtn">&#9654;</button>
+<div class="slider-row">
+<label>Frequency</label>
+<input type="range" id="freqSlider" min="30" max="120" value="55" step="0.1">
+<span class="val" id="freqVal">55.0</span>
+</div>
+<div class="slider-row">
+<label>Volume</label>
+<input type="range" id="volSlider" min="0" max="100" value="30" step="1">
+<span class="val" id="volVal">30%</span>
+</div>
+<div class="slider-row">
+<label>Waveform</label>
+<input type="range" id="waveSlider" min="0" max="3" value="0" step="1">
+<span class="val" id="waveVal">sine</span>
+</div>
+</div>
+<div class="presets">
+<button data-freq="40">40 Hz Gamma</button>
+<button data-freq="50">50 Hz Grid</button>
+<button data-freq="55" class="active">55 Hz Sweet</button>
+<button data-freq="60">60 Hz Grid</button>
+<button data-freq="7.83">7.83 Hz Schumann</button>
+</div>
+<div class="warning">
+<strong>Heads up:</strong> Keep volume low. Extended exposure to any pure tone can cause fatigue or headaches. This is an educational tool, not a therapeutic device.
+</div>
+</div>
+
+<div class="card">
+<h2>Waveform</h2>
+<canvas id="waveCanvas"></canvas>
+</div>
+
+<div class="card">
+<h2>Why 55 Hz?</h2>
+<div class="info">
+<p><strong>55 Hz sits between the two grid frequencies</strong> — it's not 50 Hz and not 60 Hz. It falls squarely in the gamma band of human brain oscillations.</p>
+<p>If you wanted to study or experience a gamma-range frequency <strong>without interference from the power grid</strong>, 55 Hz is the natural choice. It's far enough from both 50 and 60 Hz that a notch filter won't touch it, and grid harmonics won't mask it.</p>
+<br>
+<p><strong>Gamma oscillations (30–100 Hz)</strong> are associated with:</p>
+<p>&bull; Focused attention and concentration</p>
+<p>&bull; Working memory binding</p>
+<p>&bull; Sensory integration across brain regions</p>
+<p>&bull; Conscious awareness</p>
+<br>
+<p>Whether an <em>acoustic</em> tone at 55 Hz can entrain neural gamma is debated. Some studies on "gamma entrainment" use 40 Hz audio or light flicker, but the mechanism (if any) likely involves <strong>auditory steady-state response</strong> (ASSR) rather than direct electromagnetic coupling.</p>
+</div>
+</div>
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+let audioCtx,osc,gain,playing=false;
+const playBtn=document.getElementById('playBtn');
+const freqSlider=document.getElementById('freqSlider'),volSlider=document.getElementById('volSlider'),waveSlider=document.getElementById('waveSlider');
+const freqDisplay=document.getElementById('freqDisplay'),freqVal=document.getElementById('freqVal'),volVal=document.getElementById('volVal'),waveVal=document.getElementById('waveVal');
+const canvas=document.getElementById('waveCanvas'),ctx=canvas.getContext('2d');
+const waves=['sine','triangle','sawtooth','square'];
+
+function startAudio(){
+audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+osc=audioCtx.createOscillator();
+gain=audioCtx.createGain();
+osc.type=waves[parseInt(waveSlider.value)];
+osc.frequency.value=parseFloat(freqSlider.value);
+gain.gain.value=parseInt(volSlider.value)/400;
+osc.connect(gain);gain.connect(audioCtx.destination);
+osc.start();playing=true;
+playBtn.textContent='\u25A0';playBtn.classList.add('active');
+}
+
+function stopAudio(){
+if(osc){osc.stop();osc.disconnect();}
+if(audioCtx){audioCtx.close();}
+playing=false;
+playBtn.textContent='\u25B6';playBtn.classList.remove('active');
+}
+
+playBtn.addEventListener('click',()=>{playing?stopAudio():startAudio()});
+
+freqSlider.addEventListener('input',()=>{
+const f=parseFloat(freqSlider.value);
+freqDisplay.textContent=f.toFixed(2);freqVal.textContent=f.toFixed(1);
+if(osc)osc.frequency.value=f;
+document.querySelectorAll('.presets button').forEach(b=>b.classList.toggle('active',parseFloat(b.dataset.freq)===f));
+});
+
+volSlider.addEventListener('input',()=>{
+volVal.textContent=volSlider.value+'%';
+if(gain)gain.gain.value=parseInt(volSlider.value)/400;
+});
+
+waveSlider.addEventListener('input',()=>{
+const w=waves[parseInt(waveSlider.value)];
+waveVal.textContent=w;
+if(osc)osc.type=w;
+});
+
+document.querySelectorAll('.presets button').forEach(btn=>{
+btn.addEventListener('click',()=>{
+const f=parseFloat(btn.dataset.freq);
+freqSlider.value=f;freqSlider.dispatchEvent(new Event('input'));
+});
+});
+
+// waveform visualization
+function resizeCanvas(){canvas.width=canvas.clientWidth*2;canvas.height=canvas.clientHeight*2}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();
+
+function drawWave(){
+const w=canvas.width,h=canvas.height;
+ctx.clearRect(0,0,w,h);
+const freq=parseFloat(freqSlider.value);
+const waveType=parseInt(waveSlider.value);
+const cycles=4;
+ctx.strokeStyle='var(--brain)';ctx.lineWidth=2;
+ctx.beginPath();
+for(let x=0;x<w;x++){
+const t=(x/w)*cycles*Math.PI*2;
+let y;
+if(waveType===0)y=Math.sin(t);
+else if(waveType===1)y=2*Math.abs(2*(t/(2*Math.PI)-Math.floor(t/(2*Math.PI)+0.5)))-1;
+else if(waveType===2)y=2*(t/(2*Math.PI)-Math.floor(0.5+t/(2*Math.PI)));
+else y=Math.sign(Math.sin(t));
+const py=h/2-y*(h/2-20);
+x===0?ctx.moveTo(x,py):ctx.lineTo(x,py);
+}
+ctx.stroke();
+// center line
+ctx.strokeStyle='rgba(148,163,184,.2)';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+requestAnimationFrame(drawWave);
+}
+drawWave();
+</script>
+</body>
+</html>

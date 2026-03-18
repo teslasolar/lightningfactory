@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harmonic Analyzer — Grid Brain</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:2rem 0 1.5rem}
+header .icon{font-size:2.5rem}
+header h1{font-size:1.6rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.85rem;margin-top:.3rem}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--brain)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1rem;margin-bottom:1rem;color:var(--brain);letter-spacing:.05em}
+canvas{width:100%;height:320px;border-radius:6px;background:#08080d;display:block;margin-bottom:1rem}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:.5rem}
+.controls label{font-size:.8rem;color:var(--dim)}
+.controls select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:.3rem .5rem;font-family:inherit;font-size:.8rem}
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:1rem}
+th{text-align:left;color:var(--brain);border-bottom:1px solid var(--border);padding:.5rem .3rem;font-size:.75rem;letter-spacing:.05em}
+td{padding:.4rem .3rem;border-bottom:1px solid rgba(30,30,46,.5);color:var(--dim)}
+td:first-child{color:var(--text)}
+.bar-cell{width:40%}
+.bar{height:14px;border-radius:3px;background:var(--grid);transition:width .3s}
+.info{font-size:.8rem;color:var(--dim);line-height:1.7}
+.info strong{color:var(--text)}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.controls{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="icon">&#128225;</div>
+<h1>HARMONIC ANALYZER</h1>
+<div class="sub">What harmonics fill your building?</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / <a href="./">Grid Brain</a> / Harmonic Analyzer</div>
+
+<div class="card">
+<h2>Harmonic Spectrum</h2>
+<canvas id="chart"></canvas>
+<div class="controls">
+<label>Grid: <select id="gridFreq"><option value="50">50 Hz</option><option value="60" selected>60 Hz</option></select></label>
+<label>Building type: <select id="bldgType">
+<option value="residential">Residential</option>
+<option value="office" selected>Office</option>
+<option value="industrial">Industrial</option>
+<option value="datacenter">Data Center</option>
+</select></label>
+</div>
+</div>
+
+<div class="card">
+<h2>Harmonic Breakdown</h2>
+<table>
+<thead><tr><th>Harmonic</th><th>Frequency</th><th>Source</th><th>Typical %</th><th class="bar-cell">Level</th></tr></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>Why Buildings Have Harmonics</h2>
+<div class="info">
+<p>A perfect power grid would deliver a pure sine wave. But every <strong>non-linear load</strong> — LED drivers, switching power supplies, variable-speed drives, computers — distorts the waveform, injecting harmonics.</p>
+<br>
+<p><strong>Odd harmonics</strong> (3rd, 5th, 7th...) dominate because most loads are symmetrical. The <strong>3rd harmonic</strong> is especially problematic — it adds up in the neutral wire instead of canceling.</p>
+<br>
+<p>Different buildings have different harmonic signatures. A data center full of switching PSUs looks very different from a home with mostly resistive loads.</p>
+</div>
+</div>
+</div>
+
+<footer><a href="./">&#9889; Grid Brain</a> &mdash; <a href="../">Lightning Factory</a></footer>
+
+<script>
+const canvas=document.getElementById('chart'),ctx=canvas.getContext('2d');
+const freqSel=document.getElementById('gridFreq'),bldgSel=document.getElementById('bldgType');
+const tbody=document.getElementById('tableBody');
+
+const profiles={
+residential:{harmonics:[100,3.5,1.5,5,1,3,0.5,2,0.3,1.5,0.2,0.8],sources:['Fundamental','LED lighting','Motors','Computers/TVs','—','LED drivers','—','Electronics','—','Dimmer switches','—','Misc']},
+office:{harmonics:[100,8,2,6,1.5,5,1,3,0.5,2,0.3,1],sources:['Fundamental','Fluorescent ballasts','VFDs','Computer PSUs','—','UPS systems','—','Printers','—','HVAC drives','—','Misc']},
+industrial:{harmonics:[100,4,3,8,2,6,1.5,4,1,3,0.5,2],sources:['Fundamental','Welders','VFDs','6-pulse drives','—','Arc furnaces','—','Motor drives','—','Rectifiers','—','Misc']},
+datacenter:{harmonics:[100,12,2,10,1.5,8,1,5,0.8,3,0.5,2],sources:['Fundamental','Server PSUs','—','UPS (6-pulse)','—','UPS (12-pulse)','—','Cooling VFDs','—','PDU distortion','—','Misc']}
+};
+
+function resize(){canvas.width=canvas.clientWidth*2;canvas.height=canvas.clientHeight*2}
+window.addEventListener('resize',resize);resize();
+
+function draw(){
+const w=canvas.width,h=canvas.height,pad=60;
+const f=parseInt(freqSel.value);
+const profile=profiles[bldgSel.value];
+const harms=profile.harmonics;
+ctx.clearRect(0,0,w,h);
+
+const barW=(w-pad*2)/(harms.length*1.5);
+const maxH=h-pad*2;
+
+// bars
+harms.forEach((pct,i)=>{
+const x=pad+i*(barW*1.5);
+const barH=(pct/100)*maxH;
+const freq=f*(i+1);
+const inGamma=freq>=30&&freq<=100;
+
+ctx.fillStyle=i===0?'var(--grid)':inGamma?'var(--overlap)':'rgba(220,160,48,.6)';
+ctx.fillRect(x,h-pad-barH,barW,barH);
+
+ctx.fillStyle='var(--dim)';ctx.font=(10*2)+'px Space Mono';ctx.textAlign='center';
+ctx.fillText(freq+'Hz',x+barW/2,h-pad+28);
+if(pct>0.5){
+ctx.fillStyle='var(--text)';ctx.font='bold '+(10*2)+'px Space Mono';
+ctx.fillText(pct+'%',x+barW/2,h-pad-barH-10);
+}
+});
+
+// axis
+ctx.strokeStyle='var(--border)';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+
+// table
+let html='';
+harms.forEach((pct,i)=>{
+if(i===0)return;
+const freq=f*(i+1);
+html+=`<tr><td>${i+1}${i+1===3?'rd':i+1===2?'nd':'th'}</td><td>${freq} Hz</td><td>${profile.sources[i]}</td><td>${pct}%</td><td class="bar-cell"><div class="bar" style="width:${pct*8}%;${freq>=30&&freq<=100?'background:var(--overlap)':''}"></div></td></tr>`;
+});
+tbody.innerHTML=html;
+}
+
+[freqSel,bldgSel].forEach(el=>el.addEventListener('change',draw));
+draw();
+</script>
+</body>
+</html>
