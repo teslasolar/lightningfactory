@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lightning Factory — Schumann Resonance Cognitive Enhancement</title>
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--border:#1e293b;--text:#e2e8f0;--dim:#94a3b8;--accent:#38bdf8;--gold:#fbbf24;--green:#34d399;--red:#f87171;--purple:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+header{text-align:center;padding:4rem 0 3rem;border-bottom:1px solid var(--border)}
+header h1{font-size:2.4rem;letter-spacing:.3em;color:var(--gold);text-shadow:0 0 30px rgba(251,191,36,.3)}
+header .sub{color:var(--dim);margin-top:.5rem;font-size:.95rem;letter-spacing:.1em}
+header .doc-type{color:var(--accent);font-size:.8rem;margin-top:1rem;opacity:.7}
+nav{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;margin:2rem 0}
+nav h3{color:var(--accent);margin-bottom:.8rem;font-size:.85rem;letter-spacing:.15em;text-transform:uppercase}
+nav ol{list-style:none;counter-reset:toc;columns:2;column-gap:2rem}
+nav li{counter-increment:toc}
+nav li::before{content:counter(toc) ". ";color:var(--gold)}
+nav a{color:var(--text);font-size:.9rem}nav a:hover{color:var(--accent)}
+section{margin:2.5rem 0;padding-top:1.5rem;border-top:1px solid var(--border)}
+h2{color:var(--gold);font-size:1.3rem;letter-spacing:.15em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+h2 .num{color:var(--accent);font-size:.9rem}
+h3{color:var(--accent);font-size:1rem;margin:1.5rem 0 .8rem;letter-spacing:.1em}
+h4{color:var(--purple);font-size:.9rem;margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.1em}
+p{margin:.5rem 0;color:var(--dim)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem;margin:1rem 0}
+.card-title{color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+pre{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1rem;overflow-x:auto;font-size:.82rem;line-height:1.7;margin:1rem 0;color:var(--dim)}
+.highlight{color:var(--accent)}
+.gold{color:var(--gold)}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.purple{color:var(--purple)}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+th{text-align:left;color:var(--accent);padding:.6rem .8rem;border-bottom:2px solid var(--border);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+td{padding:.5rem .8rem;border-bottom:1px solid var(--border);color:var(--dim)}
+tr:hover td{background:rgba(56,189,248,.03)}
+.status{display:inline-block;padding:.1rem .5rem;border-radius:3px;font-size:.8rem}
+.status-yes{background:rgba(52,211,153,.15);color:var(--green)}
+.status-warn{background:rgba(251,191,36,.15);color:var(--gold)}
+.status-unknown{background:rgba(148,163,184,.15);color:var(--dim)}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:1rem 0}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.8rem}
+.metric .label{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.metric .value{font-size:1.1rem;color:var(--accent);margin-top:.2rem}
+.tree{font-size:.85rem;line-height:1.8}
+.tree .branch{color:var(--border)}
+.tree .leaf{color:var(--dim)}
+.tree .node{color:var(--accent)}
+.freq-bar{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;font-size:.85rem}
+.freq-bar .bar{height:8px;border-radius:4px;background:var(--accent);opacity:.8}
+.freq-bar .label{min-width:70px;color:var(--dim)}
+.freq-bar .val{color:var(--accent);min-width:60px}
+.diagram{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin:1rem 0;text-align:center;font-size:.8rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--dim)}
+.timeline{position:relative;padding-left:2rem;margin:1rem 0}
+.timeline::before{content:'';position:absolute;left:.5rem;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline .event{position:relative;margin:1rem 0;padding:.5rem 0}
+.timeline .event::before{content:'';position:absolute;left:-1.72rem;top:.7rem;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.timeline .event .date{color:var(--gold);font-size:.8rem}
+.timeline .event .desc{color:var(--dim);font-size:.9rem}
+.budget-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.budget-row .item{color:var(--dim)}.budget-row .cost{color:var(--accent)}
+.budget-total{display:flex;justify-content:space-between;padding:.6rem 0;font-size:1rem;color:var(--gold);border-top:2px solid var(--border);margin-top:.5rem}
+.gate{border-left:3px solid var(--green);padding:.5rem 1rem;margin:.5rem 0;font-size:.85rem}
+.gate.warn{border-left-color:var(--gold)}
+.gate.stop{border-left-color:var(--red)}
+.ref{font-size:.85rem;color:var(--dim);margin:.3rem 0;padding-left:1.5rem;text-indent:-1.5rem}
+.bom-table{font-size:.8rem}
+.bom-table td:last-child,.bom-table th:last-child{text-align:right}
+code{background:rgba(56,189,248,.1);padding:.1rem .4rem;border-radius:3px;font-size:.85rem;color:var(--accent)}
+.notice{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:1rem;margin:2rem 0;font-size:.85rem;color:var(--gold)}
+footer{text-align:center;padding:2rem 0;margin-top:3rem;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem}
+@media(max-width:640px){nav ol{columns:1}.metric-grid{grid-template-columns:1fr}header h1{font-size:1.6rem;letter-spacing:.15em}pre,.diagram{font-size:.7rem;padding:.8rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div style="font-size:3rem;margin-bottom:1rem">&#9889;</div>
+<h1>LIGHTNING FACTORY</h1>
+<div class="sub">Schumann Resonance Cognitive Enhancement System</div>
+<div class="doc-type">Feasibility Study, Experimental Protocols &amp; Engineering Specifications</div>
+</header>
+
+<nav>
+<h3>Table of Contents</h3>
+<ol>
+<li><a href="#exec">Executive Summary</a></li>
+<li><a href="#science">Scientific Foundation</a></li>
+<li><a href="#protocols">Experimental Protocols</a></li>
+<li><a href="#hardware">Hardware Specifications</a></li>
+<li><a href="#safety">Safety &amp; Regulatory</a></li>
+<li><a href="#roadmap">Implementation Roadmap</a></li>
+<li><a href="#refs">References</a></li>
+</ol>
+</nav>
+
+<!-- 1. EXECUTIVE SUMMARY -->
+<section id="exec">
+<h2><span class="num">01</span> Executive Summary</h2>
+
+<h3>The Hypothesis</h3>
+<p>Global lightning activity (~100 strikes/second) generates continuous ELF electromagnetic fields at 7.83 Hz and harmonics (Schumann Resonances). Human brainwaves operate at identical frequencies. Artificial replication of these fields in workspaces may enhance cognitive performance.</p>
+
+<h3>The Opportunity</h3>
+<p>No rigorous double-blind workplace productivity studies exist. First-mover advantage for validated cognitive enhancement technology.</p>
+
+<h3>Bottom Line</h3>
+<table>
+<thead><tr><th>Metric</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>Technical feasibility</td><td><span class="status status-yes">&#10003; Trivial &mdash; hardware exists</span></td></tr>
+<tr><td>Safety profile</td><td><span class="status status-yes">&#10003; Well below exposure limits</span></td></tr>
+<tr><td>Scientific plausibility</td><td><span class="status status-warn">&#9888; Suggestive, not proven</span></td></tr>
+<tr><td>Commercial viability</td><td><span class="status status-unknown">&#10067; Depends on study outcomes</span></td></tr>
+<tr><td>Regulatory pathway</td><td><span class="status status-yes">&#10003; Clear (wellness device)</span></td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- 2. SCIENTIFIC FOUNDATION -->
+<section id="science">
+<h2><span class="num">02</span> Scientific Foundation</h2>
+
+<h3>2.1 The Natural System</h3>
+<div class="diagram">         Ionosphere (~100 km)
+&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
+     &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593;
+     Standing waves at 7.83 Hz + harmonics
+     &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593; &#8593;
+   &#9889;     &#9889;        &#9889;    &#9889;      &#9889;     &#9889;
+   Lightning strikes: ~100/sec globally
+&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
+          Earth surface (conductor)</div>
+
+<h4>Resonant Frequencies</h4>
+<div class="card">
+<div class="freq-bar"><span class="label">f&#8321;</span><div class="bar" style="width:100%"></div><span class="val">7.83 Hz</span><span class="leaf">fundamental</span></div>
+<div class="freq-bar"><span class="label">f&#8322;</span><div class="bar" style="width:76%"></div><span class="val">14.3 Hz</span><span class="leaf">2nd harmonic</span></div>
+<div class="freq-bar"><span class="label">f&#8323;</span><div class="bar" style="width:56%"></div><span class="val">20.8 Hz</span><span class="leaf">3rd harmonic</span></div>
+<div class="freq-bar"><span class="label">f&#8324;</span><div class="bar" style="width:40%"></div><span class="val">27.3 Hz</span><span class="leaf">4th harmonic</span></div>
+<div class="freq-bar"><span class="label">f&#8325;</span><div class="bar" style="width:28%"></div><span class="val">33.8 Hz</span><span class="leaf">5th harmonic</span></div>
+<div class="freq-bar"><span class="label">f&#8326;</span><div class="bar" style="width:18%"></div><span class="val">39.0 Hz</span><span class="leaf">6th harmonic</span></div>
+</div>
+
+<h4>Field Characteristics</h4>
+<div class="metric-grid">
+<div class="metric"><div class="label">Magnetic field</div><div class="value">~1 pT (10&#8315;&#185;&#178; T)</div></div>
+<div class="metric"><div class="label">Electric field</div><div class="value">~0.1 mV/m</div></div>
+<div class="metric"><div class="label">Energy density</div><div class="value">~10&#8315;&#8311; J/s&middot;m&sup3;</div></div>
+<div class="metric"><div class="label">Coverage</div><div class="value">Global, continuous</div></div>
+</div>
+
+<h3>2.2 Human Brainwave Correspondence</h3>
+<div class="diagram">Hz:  0    5    10   15   20   25   30   35   40
+     |    |    |    |    |    |    |    |    |
+SR:       &#9660;         &#9660;         &#9660;         &#9660;    &#9660;
+         7.83     14.3      20.8      27.3  33.8
+
+EEG: |====DELTA====|
+          |====THETA====|
+               |=====ALPHA=====|
+                    |========BETA========|
+                                    |===GAMMA===|</div>
+
+<h4>Functional Mapping</h4>
+<table>
+<thead><tr><th>Frequency</th><th>Band</th><th>Function</th></tr></thead>
+<tbody>
+<tr><td>7.83 Hz</td><td>Theta</td><td>Creativity, meditation, insight</td></tr>
+<tr><td>14.3 Hz</td><td>Alpha</td><td>Relaxed focus, learning</td></tr>
+<tr><td>20.8 Hz</td><td>Beta</td><td>Active thinking, problem-solving</td></tr>
+<tr><td>27.3 Hz</td><td>Beta</td><td>Concentration</td></tr>
+<tr><td>33.8 Hz</td><td>Gamma</td><td>Peak cognition, binding</td></tr>
+</tbody>
+</table>
+
+<h3>2.3 Existing Evidence Summary</h3>
+<table>
+<thead><tr><th>Study</th><th>Finding</th><th>Strength</th></tr></thead>
+<tbody>
+<tr><td>Persinger 2012</td><td>Real-time EEG-SR coherence</td><td><span class="green">Peer-reviewed, replicated</span></td></tr>
+<tr><td>Saroka &amp; Persinger 2015</td><td>Spectral power density correlation</td><td><span class="green">Peer-reviewed</span></td></tr>
+<tr><td>Cherry 2003</td><td>Evolutionary brain-SR tuning hypothesis</td><td><span class="gold">Theoretical</span></td></tr>
+<tr><td>PEMF cardiac studies</td><td>7.83 Hz protects against oxidative stress</td><td><span class="green">Multiple replications</span></td></tr>
+<tr><td>Grounding/earthing studies</td><td>EEG alpha increase within milliseconds</td><td><span class="gold">Moderate quality</span></td></tr>
+<tr><td>Ion exposure studies</td><td>Negative ions &rarr; relaxed alpha states</td><td><span class="gold">Mixed results</span></td></tr>
+</tbody>
+</table>
+<p><strong style="color:var(--gold)">Gap:</strong> No controlled workplace productivity studies.</p>
+</section>
+
+<!-- 3. EXPERIMENTAL PROTOCOLS -->
+<section id="protocols">
+<h2><span class="num">03</span> Experimental Protocols</h2>
+
+<h3>3.1 Study 1: Acute Cognitive Effects (Lab)</h3>
+<p><strong>Design:</strong> Randomized Double-Blind Crossover &mdash; N=60 healthy adults</p>
+<p style="font-size:.85rem">(Power analysis: d=0.5, &alpha;=0.05, &beta;=0.80)</p>
+
+<div class="diagram">Screening  &rarr;  Baseline  &rarr;  Condition A  &rarr;  Washout (7d)  &rarr;  Condition B
+
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;Health  &#9474;   &#9474;Cognitive&#9474;   &#9474; 60 min   &#9474;   &#9474;       &#9474;   &#9474; 60 min   &#9474;
+&#9474;screen  &#9474;   &#9474;battery  &#9474;   &#9474; exposure &#9474;   &#9474;       &#9474;   &#9474; exposure &#9474;
+&#9474;EEG cap &#9474;   &#9474;EEG rest &#9474;   &#9474; + tests  &#9474;   &#9474;       &#9474;   &#9474; + tests  &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+
+Conditions:  ACTIVE (7.83 Hz + harmonics, 1-10 &#181;T)  vs  SHAM (device on, 0 field)
+Randomization: Counterbalanced &mdash; half get Active first, half Sham first
+Blinding: Participants &amp; testers unaware of condition</div>
+
+<h4>Primary Outcomes (Cognitive Battery)</h4>
+<div class="card">
+<div class="tree">
+<span class="node">Working memory</span> &mdash; N-back task (2-back, 3-back): accuracy %, reaction time<br>
+<span class="node">Attention</span> &mdash; Continuous Performance Test: d' sensitivity, commission errors<br>
+<span class="node">Executive function</span> &mdash; Trail Making Test (A &amp; B): completion time, errors<br>
+<span class="node">Processing speed</span> &mdash; Symbol Digit Modalities Test: correct responses in 90s<br>
+<span class="node">Creativity</span> &mdash; Alternate Uses Task: fluency, flexibility, originality
+</div>
+</div>
+
+<h4>Secondary Outcomes (Physiological)</h4>
+<div class="card">
+<div class="tree">
+<span class="node">EEG</span> &mdash; Power spectral density, coherence with applied field, alpha peak frequency shift<br>
+<span class="node">Heart Rate Variability</span> &mdash; RMSSD, SDNN, LF/HF ratio<br>
+<span class="node">Salivary cortisol</span> &mdash; Pre/post exposure samples<br>
+<span class="node">Subjective</span> &mdash; VAS (alertness, focus, mood), NASA Task Load Index
+</div>
+</div>
+
+<h4>Statistical Analysis Plan</h4>
+<div class="card">
+<pre style="border:none;margin:0;padding:0;background:transparent">Mixed-effects model:
+  Y = &#946;&#8320; + &#946;&#8321;(Condition) + &#946;&#8322;(Order) + &#946;&#8323;(Period) + u&#7522; + &#949;
+
+Multiple comparison correction: Benjamini-Hochberg FDR (q &lt; 0.05)
+Effect size: Cohen's d with 95% CI
+Responder analysis: Subgroups by baseline alpha power
+EEG-behavior correlation: Does &#916;alpha predict &#916;cognition?</pre>
+</div>
+
+<h3>3.2 Study 2: Chronic Workplace Effects (Field)</h3>
+<p><strong>Design:</strong> Cluster-Randomized Controlled Trial &mdash; 8 offices, 12 weeks</p>
+
+<div class="diagram">Site selection: 8 comparable open-plan offices (same company)
+Randomization: 4 offices &#8594; Active  |  4 offices &#8594; Sham
+Duration: 12 weeks  |  Operation: 8am-6pm weekdays
+
+Blinding:
+  Participants &mdash; Told "environmental optimization system"
+  Managers &mdash; Unaware of condition assignment
+  Data collectors &mdash; Blinded to office condition</div>
+
+<h4>Primary Outcomes</h4>
+<div class="card">
+<div class="tree">
+<span class="node">Objective work output</span> &mdash; Lines of code / commits, documents completed, tickets closed<br>
+<span class="node">Error rates</span> &mdash; Quality metrics from existing systems<br>
+<span class="node">Meeting efficiency</span> &mdash; Decisions per meeting-hour (observer-rated)
+</div>
+</div>
+
+<h4>Secondary Outcomes</h4>
+<div class="card">
+<div class="tree">
+<span class="node">Cognitive tests</span> &mdash; N-back, Symbol Digit (monthly, 5-min battery)<br>
+<span class="node">Wellbeing surveys</span> &mdash; WHO-5, PSS-4, Pittsburgh Sleep Quality (weekly)<br>
+<span class="node">Physiological</span> &mdash; Wearable HRV continuous, morning salivary cortisol (n=40)<br>
+<span class="node">Sick days taken</span> &amp; <span class="node">Employee turnover intent</span>
+</div>
+</div>
+
+<h4>Power Analysis</h4>
+<div class="card">
+<pre style="border:none;margin:0;padding:0;background:transparent">Minimum detectable effect: 8% productivity increase
+ICC (intra-cluster correlation): 0.05
+Average cluster size: 25 employees
+Design effect: 1 + (25-1)(0.05) = 2.2
+Effective sample size per arm: 100 / 2.2 &asymp; 45
+Clusters needed per arm: 45 / 25 &asymp; 2 (with buffer: 4)
+Total: 8 offices, ~200 participants</pre>
+</div>
+
+<h3>3.3 Study 3: Dose-Response Characterization</h3>
+<p><strong>Design:</strong> Within-Subjects Parametric &mdash; N=30, 6 sessions each</p>
+
+<table>
+<thead><tr><th>Condition</th><th>Frequency</th><th>Field Strength</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>SHAM</td><td>None</td><td>0 &#181;T</td><td>Control</td></tr>
+<tr><td>LOW-7.83</td><td>7.83 Hz only</td><td>1 &#181;T</td><td></td></tr>
+<tr><td>MED-7.83</td><td>7.83 Hz only</td><td>10 &#181;T</td><td></td></tr>
+<tr><td>HIGH-7.83</td><td>7.83 Hz only</td><td>100 &#181;T</td><td></td></tr>
+<tr><td>HARMONICS</td><td>7.83+14.3+20.8</td><td>10 &#181;T each</td><td></td></tr>
+<tr><td>MISMATCH</td><td>11 Hz</td><td>10 &#181;T</td><td>Control</td></tr>
+</tbody>
+</table>
+<p>Questions: dose-response relationship? 7.83 Hz specificity? Harmonic benefit? Optimal field strength?</p>
+</section>
+
+<!-- 4. HARDWARE SPECIFICATIONS -->
+<section id="hardware">
+<h2><span class="num">04</span> Hardware Specifications</h2>
+
+<h3>4.1 System Architecture</h3>
+<div class="diagram">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; CONTROL UNIT &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                                                           &#9474;
+&#9474;  &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;  &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;  &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9474;
+&#9474;  &#9474; Waveform  &#9474;  &#9474; Amplifier &#9474;  &#9474; Monitoring&#9474;     &#9474;
+&#9474;  &#9474; Generator &#9474;&#9472;&#9658;&#9474; Stage     &#9474;&#9472;&#9658;&#9474; &amp; Logging &#9474;     &#9474;
+&#9474;  &#9474; (DSP)     &#9474;  &#9474; (Class D) &#9474;  &#9474; (&#181;C+WiFi) &#9474;     &#9474;
+&#9474;  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9474;
+&#9474;                                                           &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                            &#9474;
+              &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+              &#9474;                           &#9474;
+        &#9484;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9488;           &#9484;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9488;
+        &#9474;  COIL    &#9474;           &#9474;  COIL    &#9474;
+        &#9474;  ARRAY   &#9474;           &#9474;  ARRAY   &#9474;
+        &#9474;  (North) &#9474;           &#9474;  (South) &#9474;
+        &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;           &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+              &#9474;                           &#9474;
+              &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                            &#9474;
+                 &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+                 &#9474; WORKSPACE VOLUME &#9474;
+                 &#9474; 1-100 &#181;T @ 7.83 Hz&#9474;
+                 &#9474; + harmonics      &#9474;
+                 &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</div>
+
+<h3>4.2 Component Specifications</h3>
+
+<div class="card">
+<div class="card-title">Waveform Generator</div>
+<div class="tree">
+Type: Direct Digital Synthesis (DDS) &mdash; Freq resolution: 0.01 Hz<br>
+Range: 0.1&ndash;100 Hz &mdash; Waveform: Sinusoidal (THD &lt; 0.1%)<br>
+Channels: 6 (one per harmonic) &mdash; Phase control: 0&ndash;360&deg; per channel<br>
+Output: 0&ndash;5V analog
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Amplifier</div>
+<div class="tree">
+Type: Class D (efficiency &gt; 90%) &mdash; Power: 50W per channel<br>
+Load: Optimized for inductive (coil) &mdash; Current: 0&ndash;10A per coil<br>
+Protection: Overcurrent, thermal, short
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Coil Array (per unit)</div>
+<div class="tree">
+Type: Helmholtz-like configuration &mdash; Wire: 14 AWG enameled copper<br>
+Turns: 200 per coil &mdash; Diameter: 1.5 m &mdash; Spacing: 0.75 m<br>
+Inductance: ~50 mH &mdash; Resistance: ~2 &#937;<br>
+Field uniformity: &plusmn;5% over 2m&sup3; volume &mdash; Mounting: Ceiling or floor
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Field Strength Targets</div>
+<div class="tree">
+Minimum effective: 1 &#181;T (1000x natural SR)<br>
+Typical operating: 10 &#181;T &mdash; Maximum: 100 &#181;T<br>
+Reference: Earth's DC field ~50 &#181;T<br>
+Safety limit: &lt; 400 &#181;T (ICNIRP occupational)
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Monitoring Subsystem</div>
+<div class="tree">
+Magnetometer: 3-axis fluxgate &mdash; Range: &plusmn;200 &#181;T &mdash; Resolution: 0.01 &#181;T &mdash; Bandwidth: DC&ndash;100 Hz<br>
+Microcontroller: ESP32 &mdash; Logging: Local SD + cloud upload<br>
+Alerts: Field deviation, coil fault &mdash; API: REST interface
+</div>
+</div>
+
+<h3>4.3 Installation Configurations</h3>
+
+<div class="card">
+<div class="card-title">Config A &mdash; Single Workstation</div>
+<div class="metric-grid">
+<div class="metric"><div class="label">Cost</div><div class="value">~$500</div></div>
+<div class="metric"><div class="label">Coverage</div><div class="value">1 person</div></div>
+<div class="metric"><div class="label">Power</div><div class="value">10W</div></div>
+<div class="metric"><div class="label">Zone</div><div class="value">2m &times; 2m &times; 2m</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Config B &mdash; Open Office (50 people)</div>
+<div class="metric-grid">
+<div class="metric"><div class="label">Cost</div><div class="value">~$8,000</div></div>
+<div class="metric"><div class="label">Coverage</div><div class="value">~200 m&sup2;</div></div>
+<div class="metric"><div class="label">Power</div><div class="value">200W</div></div>
+<div class="metric"><div class="label">Coils</div><div class="value">8 ceiling + 8 floor</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Config C &mdash; Conference Room</div>
+<div class="metric-grid">
+<div class="metric"><div class="label">Cost</div><div class="value">~$1,500</div></div>
+<div class="metric"><div class="label">Coverage</div><div class="value">8&ndash;12 people</div></div>
+<div class="metric"><div class="label">Power</div><div class="value">30W</div></div>
+<div class="metric"><div class="label">Setup</div><div class="value">Ceiling + under-table</div></div>
+</div>
+</div>
+
+<h3>4.4 Waveform Specification</h3>
+<p><strong>Signal Profile:</strong> "Natural Lightning Simulation"</p>
+
+<table>
+<thead><tr><th>Freq (Hz)</th><th>Amplitude</th><th>Phase</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>7.83</td><td>1.000</td><td>0&deg;</td><td>Fundamental (theta)</td></tr>
+<tr><td>14.30</td><td>0.600</td><td>30&deg;</td><td>2nd harmonic (alpha)</td></tr>
+<tr><td>20.80</td><td>0.400</td><td>60&deg;</td><td>3rd harmonic (beta)</td></tr>
+<tr><td>27.30</td><td>0.250</td><td>90&deg;</td><td>4th harmonic</td></tr>
+<tr><td>33.80</td><td>0.150</td><td>120&deg;</td><td>5th harmonic (gamma)</td></tr>
+<tr><td>39.00</td><td>0.100</td><td>150&deg;</td><td>6th harmonic</td></tr>
+</tbody>
+</table>
+
+<div class="card">
+<pre style="border:none;margin:0;padding:0;background:transparent">Composite waveform equation:
+  B(t) = B&#8320; &times; &#931;&#7522; A&#7522; &times; sin(2&#960; &times; f&#7522; &times; t + &#966;&#7522;)
+
+Where B&#8320; = base field strength (1&ndash;100 &#181;T)</pre>
+</div>
+</section>
+
+<!-- 5. SAFETY & REGULATORY -->
+<section id="safety">
+<h2><span class="num">05</span> Safety &amp; Regulatory</h2>
+
+<h3>5.1 Exposure Limits</h3>
+<div class="diagram">Field strength comparison (&#181;T):
+
+0.001    0.01     0.1      1       10      100     1,000    &#181;T
+  &#9474;        &#9474;        &#9474;       &#9474;        &#9474;========&#9474;        &#9474;
+  &#9474;        &#9474;        &#9474;       &#9474;        &#9474; Lightning &#9474;      &#9474;
+  &#9474;        &#9474;        &#9474;       &#9474;        &#9474; Factory  &#9474;       &#9474;
+  &#9474;        &#9474;        &#9474;       &#9474;        &#9474;        &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508; ICNIRP occupational
+  &#9474;        &#9474;        &#9474;       &#9474;        &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;        &#9474;  ICNIRP public
+  &#9474;        &#9474;        &#9474;       &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;        &#9474;        &#9474;  Typical PEMF therapy
+  &#9474;        &#9474;        &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;        &#9474;        &#9474;        &#9474;  Power line exposure
+  &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;        &#9474;       &#9474;        &#9474;        &#9474;        &#9474;  Natural Schumann
+
+OPERATING MARGIN: 100&ndash;1000x below occupational limits</div>
+
+<h3>5.2 Regulatory Pathway</h3>
+<div class="card">
+<div class="card-title">United States (FDA)</div>
+<div class="tree">
+Classification: General wellness device &mdash; NOT a medical device<br>
+No premarket submission required<br>
+Labeling: "Intended to support relaxation and focus"
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">European Union (CE)</div>
+<div class="tree">
+Low Voltage Directive (LVD) + EMC Directive<br>
+Not a medical device per MDR &mdash; Self-declaration with technical file
+</div>
+</div>
+
+<h4>Permissible Claims</h4>
+<table>
+<thead><tr><th style="color:var(--green)">CAN claim</th><th style="color:var(--red)">CANNOT claim</th></tr></thead>
+<tbody>
+<tr><td>"Supports relaxation"</td><td>"Treats" any condition</td></tr>
+<tr><td>"Promotes focus"</td><td>"Cures" anything</td></tr>
+<tr><td>"Simulates natural Earth frequencies"</td><td>"Improves cognition" (unqualified)</td></tr>
+<tr><td>"Environmental optimization"</td><td>Any disease-related claim</td></tr>
+</tbody>
+</table>
+
+<h3>5.3 Contraindications &amp; Warnings</h3>
+<div class="card">
+<div class="card-title" style="color:var(--red)">Contraindications</div>
+<div class="tree">
+<span class="red">&#9679;</span> Implanted electronic devices (pacemakers, defibrillators, insulin pumps, cochlear implants)<br>
+<span class="red">&#9679;</span> Pregnancy (precautionary)<br>
+<span class="red">&#9679;</span> Epilepsy / seizure disorders (theoretical risk of frequency entrainment)
+</div>
+</div>
+
+<div class="card">
+<div class="card-title" style="color:var(--gold)">Warnings</div>
+<div class="tree">
+<span class="gold">&#9679;</span> Not a substitute for medical treatment<br>
+<span class="gold">&#9679;</span> Discontinue if any adverse symptoms<br>
+<span class="gold">&#9679;</span> Keep away from magnetic storage media<br>
+<span class="gold">&#9679;</span> May interfere with sensitive instruments
+</div>
+</div>
+</section>
+
+<!-- 6. IMPLEMENTATION ROADMAP -->
+<section id="roadmap">
+<h2><span class="num">06</span> Implementation Roadmap</h2>
+
+<h3>6.1 Phase Timeline</h3>
+<div class="timeline">
+<div class="event"><div class="date">Year 1 Q1&ndash;Q4 &mdash; Phase 1</div><div class="desc">Hardware development, lab prototype, IRB approval</div></div>
+<div class="event"><div class="date">Year 2 Q1&ndash;Q3 &mdash; Phase 2</div><div class="desc">Lab study (n=60), dose-response characterization, data analysis</div></div>
+<div class="event"><div class="date">Year 2 Q3 &ndash; Year 3 Q1 &mdash; Phase 3</div><div class="desc">Field study (n=200), 8 offices, 12 weeks</div></div>
+<div class="event"><div class="date">Year 3 Q1&ndash;Q2 &mdash; Phase 4</div><div class="desc">Product launch &amp; first commercial installation</div></div>
+</div>
+
+<h4>Milestones</h4>
+<table>
+<thead><tr><th>ID</th><th>Target</th><th>Milestone</th></tr></thead>
+<tbody>
+<tr><td>M1</td><td>Q2 Y1</td><td>Working prototype</td></tr>
+<tr><td>M2</td><td>Q3 Y1</td><td>IRB approval</td></tr>
+<tr><td>M3</td><td>Q2 Y2</td><td>Lab study published</td></tr>
+<tr><td>M4</td><td>Q4 Y2</td><td>Field study complete</td></tr>
+<tr><td>M5</td><td>Q1 Y3</td><td>Commercial product ready</td></tr>
+<tr><td>M6</td><td>Q2 Y3</td><td>First commercial installation</td></tr>
+</tbody>
+</table>
+
+<h3>6.2 Budget Estimate</h3>
+
+<div class="card">
+<div class="card-title">Phase 1: Hardware Development</div>
+<div class="budget-row"><span class="item">Electronic components &amp; prototyping</span><span class="cost">$15,000</span></div>
+<div class="budget-row"><span class="item">Coil fabrication (5 prototypes)</span><span class="cost">$10,000</span></div>
+<div class="budget-row"><span class="item">Test equipment (magnetometers, etc.)</span><span class="cost">$20,000</span></div>
+<div class="budget-row"><span class="item">Engineering labor (6 months)</span><span class="cost">$90,000</span></div>
+<div class="budget-total"><span>Subtotal</span><span>$135,000</span></div>
+</div>
+
+<div class="card">
+<div class="card-title">Phase 2: Lab Study</div>
+<div class="budget-row"><span class="item">EEG equipment (if not available)</span><span class="cost">$30,000</span></div>
+<div class="budget-row"><span class="item">Participant compensation (60 &times; $200)</span><span class="cost">$12,000</span></div>
+<div class="budget-row"><span class="item">Lab rental / overhead</span><span class="cost">$20,000</span></div>
+<div class="budget-row"><span class="item">Research staff (12 months)</span><span class="cost">$80,000</span></div>
+<div class="budget-row"><span class="item">Statistical consulting</span><span class="cost">$10,000</span></div>
+<div class="budget-total"><span>Subtotal</span><span>$152,000</span></div>
+</div>
+
+<div class="card">
+<div class="card-title">Phase 3: Field Study</div>
+<div class="budget-row"><span class="item">8 office installations</span><span class="cost">$64,000</span></div>
+<div class="budget-row"><span class="item">Wearables for HRV subset</span><span class="cost">$8,000</span></div>
+<div class="budget-row"><span class="item">Research staff (12 months)</span><span class="cost">$80,000</span></div>
+<div class="budget-row"><span class="item">Site coordination</span><span class="cost">$20,000</span></div>
+<div class="budget-row"><span class="item">Data analysis</span><span class="cost">$15,000</span></div>
+<div class="budget-total"><span>Subtotal</span><span>$187,000</span></div>
+</div>
+
+<div class="card">
+<div class="card-title">Phase 4: Commercialization</div>
+<div class="budget-row"><span class="item">Industrial design</span><span class="cost">$30,000</span></div>
+<div class="budget-row"><span class="item">Manufacturing setup</span><span class="cost">$50,000</span></div>
+<div class="budget-row"><span class="item">Certification (CE, UL)</span><span class="cost">$25,000</span></div>
+<div class="budget-row"><span class="item">Initial inventory</span><span class="cost">$40,000</span></div>
+<div class="budget-row"><span class="item">Marketing / launch</span><span class="cost">$30,000</span></div>
+<div class="budget-total"><span>Subtotal</span><span>$175,000</span></div>
+</div>
+
+<div class="card" style="border-color:var(--gold)">
+<div class="budget-total" style="font-size:1.2rem;border:none;margin:0;padding:0"><span>TOTAL PROJECT BUDGET</span><span>$649,000</span></div>
+</div>
+
+<h3>6.3 Go/No-Go Decision Criteria</h3>
+
+<h4>After Phase 2 (Lab Study)</h4>
+<div class="gate"><span class="green">PROCEED</span> if: &ge;2 cognitive measures at p &lt; 0.05, effect size d &gt; 0.3, no adverse events, clear dose-response or frequency-specificity</div>
+<div class="gate warn"><span class="gold">PIVOT</span> if: Physiological effects (EEG, HRV) but no cognition &rarr; reframe as wellness/stress-reduction device</div>
+<div class="gate stop"><span class="red">TERMINATE</span> if: No significant effects, effects identical between 7.83 Hz and mismatch, sham performs equal or better</div>
+
+<h4>After Phase 3 (Field Study)</h4>
+<div class="gate"><span class="green">PROCEED</span> if: Productivity increase &ge;5%, OR wellbeing improvement &ge;0.5 SD, positive ROI for customers, no adverse effects pattern</div>
+</section>
+
+<!-- 7. REFERENCES -->
+<section id="refs">
+<h2><span class="num">07</span> References</h2>
+
+<h4>Primary Scientific Literature</h4>
+<div class="ref">1. Persinger, M.A. (2012). Brain electromagnetic activity and lightning: potentially congruent scale-invariant quantitative properties. <em>Frontiers in Integrative Neuroscience</em>, 6, 19. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3351789/">PMC3351789</a></div>
+<div class="ref">2. Saroka, K.S. &amp; Persinger, M.A. (2015). Human Quantitative EEG and Schumann Resonance Exhibit Real-Time Coherence. <em>J. Signal and Information Processing</em>, 6, 153-164. <a href="https://www.scirp.org/journal/paperinformation?paperid=56609">SCIRP</a></div>
+<div class="ref">3. Cherry, N.J. (2003). Human intelligence: the brain, an electromagnetic system synchronised by the Schumann Resonance signal. <em>Medical Hypotheses</em>, 60(6), 843-844. <a href="https://pubmed.ncbi.nlm.nih.gov/12699709/">PubMed</a></div>
+<div class="ref">4. Price, C. (2016). ELF Electromagnetic Waves from Lightning: The Schumann Resonances. <em>Atmosphere</em>, 7(9), 116. <a href="https://www.mdpi.com/2073-4433/7/9/116">MDPI</a></div>
+<div class="ref">5. Price, C. &amp; Williams, E. (2020). Natural ELF fields in the atmosphere and in living organisms. <em>Int. J. Biometeorology</em>. <a href="https://link.springer.com/article/10.1007/s00484-020-01864-6">Springer</a></div>
+<div class="ref">6. McCraty, R. et al. (2017). Synchronization of Human Autonomic Nervous System Rhythms with Geomagnetic Activity. <em>IJERPH</em>, 14(7), 770. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5551208/">PMC5551208</a></div>
+
+<h4>Safety Standards</h4>
+<div class="ref">1. ICNIRP (2010). Guidelines for Limiting Exposure to Time-Varying Electric and Magnetic Fields (1 Hz &ndash; 100 kHz). <em>Health Physics</em>, 99(6), 818-836.</div>
+<div class="ref">2. IEEE C95.6 (2002). Standard for Safety Levels with Respect to Human Exposure to Electromagnetic Fields, 0&ndash;3 kHz.</div>
+
+<h4>Supplementary</h4>
+<div class="ref">1. Youvan, D.C. (2024). Brain Waves and the Schumann Resonance. <a href="https://www.researchgate.net/publication/384040884">ResearchGate</a></div>
+<div class="ref">2. Schumann Resonances and Human Bioregulation. <a href="https://www.brmi.online/post/2019/09/20/schumann-resonances-and-their-effect-on-human-bioregulation">BRMI</a></div>
+
+<h3>Appendix A: Bill of Materials (Prototype)</h3>
+<table class="bom-table">
+<thead><tr><th>Qty</th><th>Component</th><th>Supplier</th><th>Total</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>ESP32 DevKit</td><td>Espressif</td><td>$10</td></tr>
+<tr><td>1</td><td>AD9833 DDS Module</td><td>Analog Devices</td><td>$15</td></tr>
+<tr><td>1</td><td>TPA3116 Class D Amp (2ch)</td><td>TI</td><td>$25</td></tr>
+<tr><td>2</td><td>14 AWG magnet wire (500ft)</td><td>Remington</td><td>$160</td></tr>
+<tr><td>2</td><td>Coil former (1.5m hoop)</td><td>Custom</td><td>$100</td></tr>
+<tr><td>1</td><td>24V 10A Power Supply</td><td>Mean Well</td><td>$40</td></tr>
+<tr><td>1</td><td>HMC5883L Magnetometer</td><td>Honeywell</td><td>$12</td></tr>
+<tr><td>1</td><td>SD Card Module</td><td>Generic</td><td>$5</td></tr>
+<tr><td>1</td><td>Enclosure</td><td>Hammond</td><td>$30</td></tr>
+<tr><td>&ndash;</td><td>Connectors, wire, misc</td><td>Various</td><td>$50</td></tr>
+</tbody>
+<tfoot><tr><td colspan="3" style="text-align:right;color:var(--gold);font-weight:bold">TOTAL</td><td style="color:var(--gold);font-weight:bold">$447</td></tr></tfoot>
+</table>
+
+<h3>Appendix B: Firmware Pseudocode</h3>
+<pre><span class="highlight">// LIGHTNING_FACTORY_v1.0</span>
+<span class="highlight">// Schumann resonance generator firmware</span>
+
+<span class="purple">#define</span> F1  7.83   <span class="dim">// Fundamental</span>
+<span class="purple">#define</span> F2  14.30  <span class="dim">// 2nd harmonic</span>
+<span class="purple">#define</span> F3  20.80  <span class="dim">// 3rd harmonic</span>
+<span class="purple">#define</span> F4  27.30  <span class="dim">// 4th harmonic</span>
+<span class="purple">#define</span> F5  33.80  <span class="dim">// 5th harmonic</span>
+<span class="purple">#define</span> F6  39.00  <span class="dim">// 6th harmonic</span>
+
+<span class="gold">float</span> amplitudes[] = {1.0, 0.6, 0.4, 0.25, 0.15, 0.10};
+<span class="gold">float</span> phases[]     = {0, 30, 60, 90, 120, 150};
+
+<span class="gold">void</span> <span class="highlight">setup</span>() {
+    init_dds();
+    init_amplifier();
+    init_magnetometer();
+    init_wifi();
+    init_logging();
+    set_field_strength(10.0);  <span class="dim">// &#181;T</span>
+    set_frequencies({F1, F2, F3, F4, F5, F6});
+    set_amplitudes(amplitudes);
+    set_phases(phases);
+}
+
+<span class="gold">void</span> <span class="highlight">loop</span>() {
+    update_dds_output();
+    <span class="gold">float</span> measured_field = read_magnetometer();
+
+    <span class="dim">// Closed-loop control</span>
+    <span class="purple">if</span> (abs(measured_field - target_field) > 0.1) {
+        adjust_amplifier_gain();
+    }
+
+    <span class="dim">// Log data every second</span>
+    <span class="purple">if</span> (millis() - last_log > 1000) {
+        log_to_sd(timestamp, measured_field, target_field);
+        upload_to_cloud();
+        last_log = millis();
+    }
+
+    <span class="purple">if</span> (wifi_command_available()) {
+        process_command();
+    }
+}</pre>
+</section>
+
+<div class="notice">
+<strong>NOTICE:</strong> This document describes experimental technology. The cognitive enhancement effects of artificial Schumann resonance exposure are hypothetical and require validation through the proposed studies. This is not medical advice.
+</div>
+
+<footer>
+<div style="color:var(--gold);margin-bottom:.5rem">&#9889; LIGHTNING FACTORY</div>
+Document version 1.0 &mdash; Prepared for KONOMI Project &mdash; March 2026
+</footer>
+
+</div>
+</body>
+</html>
