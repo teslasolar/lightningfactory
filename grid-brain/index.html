@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grid Brain — Lightning Factory</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#111119;--border:#1e1e2e;--text:#e2e8f0;--dim:#94a3b8;--grid:#DCA030;--brain:#00C8DC;--overlap:#CC3333;--safe:#33CC66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--brain);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem;flex:1}
+header{text-align:center;padding:3rem 0 2rem}
+header .icon{font-size:3rem;cursor:default;user-select:none}
+header h1{font-size:2rem;letter-spacing:.2em;background:linear-gradient(90deg,var(--grid),var(--brain));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--dim);font-size:.9rem;margin-top:.3rem;letter-spacing:.05em}
+.breadcrumb{text-align:center;margin-bottom:2rem;font-size:.8rem;color:var(--dim)}
+.breadcrumb a{color:var(--dim)}
+.breadcrumb a:hover{color:var(--brain)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:2rem 0}
+.tool{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.2rem;transition:border-color .2s,transform .15s;display:flex;flex-direction:column;gap:.5rem}
+.tool:hover{border-color:var(--brain);transform:translateY(-2px)}
+.tool .emoji{font-size:1.5rem}
+.tool h2{font-size:.95rem;color:var(--text);letter-spacing:.05em}
+.tool p{font-size:.8rem;color:var(--dim);line-height:1.5}
+.tool .status{font-size:.7rem;margin-top:auto;padding-top:.5rem;color:var(--dim);opacity:.6}
+.tool.live .status{color:var(--safe);opacity:1}
+footer{text-align:center;padding:2rem 0;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem;margin-top:2rem}
+footer a{color:var(--grid)}
+@media(max-width:600px){.grid{grid-template-columns:1fr}header h1{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div class="icon" id="bolt">&#9889;</div>
+<h1>GRID BRAIN</h1>
+<div class="sub">Power Grid vs Your Brain</div>
+</header>
+
+<div class="breadcrumb"><a href="../">Lightning Factory</a> / Grid Brain</div>
+
+<div class="grid">
+
+<a href="overlap.html" class="tool">
+<div class="emoji">&#128268;</div>
+<h2>Frequency Overlap</h2>
+<p>See where the grid meets your gamma</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="calculator.html" class="tool">
+<div class="emoji">&#128208;</div>
+<h2>Current Calculator</h2>
+<p>How much current does the grid induce in you?</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="harmonics.html" class="tool">
+<div class="emoji">&#128225;</div>
+<h2>Harmonic Analyzer</h2>
+<p>What harmonics fill your building?</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="exposure.html" class="tool">
+<div class="emoji">&#127968;</div>
+<h2>Exposure Estimator</h2>
+<p>What's your 24-hour EMF profile?</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="compare.html" class="tool">
+<div class="emoji">&#128506;</div>
+<h2>World Frequency Map</h2>
+<p>50Hz or 60Hz? Depends where you are</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="blindspot.html" class="tool">
+<div class="emoji">&#128269;</div>
+<h2>The Blind Spot</h2>
+<p>Why neuroscience can't see this</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="hum.html" class="tool">
+<div class="emoji">&#127925;</div>
+<h2>55Hz Hum Generator</h2>
+<p>Your frequency, not the grid's</p>
+<div class="status">coming soon</div>
+</a>
+
+<a href="monitor.html" class="tool">
+<div class="emoji">&#127908;</div>
+<h2>Live Room Monitor</h2>
+<p>What frequency is YOUR room humming at?</p>
+<div class="status">coming soon</div>
+</a>
+
+</div>
+
+</div>
+
+<footer>
+Grid Brain is part of <a href="../">Lightning Factory</a><br>
+<span style="font-size:.7rem;opacity:.6">KONOMI Project &mdash; March 2026</span>
+</footer>
+
+<script>
+let c=0;document.getElementById('bolt').addEventListener('click',()=>{c++;if(c===7){const d=document.createElement('div');d.textContent='510,510';d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:var(--grid);text-shadow:0 0 40px rgba(220,160,48,.6);z-index:99;animation:fadeOut 2s forwards';document.body.appendChild(d);const s=document.createElement('style');s.textContent='@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}';document.head.appendChild(s);setTimeout(()=>d.remove(),2000);c=0}});
+</script>
+</body>
+</html>
