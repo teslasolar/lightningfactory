@@ -9,17 +9,28 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
-header{text-align:center;padding:4rem 0 3rem;border-bottom:1px solid var(--border)}
-header h1{font-size:2.4rem;letter-spacing:.3em;color:var(--gold);text-shadow:0 0 30px rgba(251,191,36,.3)}
-header .sub{color:var(--dim);margin-top:.5rem;font-size:.95rem;letter-spacing:.1em}
-header .doc-type{color:var(--accent);font-size:.8rem;margin-top:1rem;opacity:.7}
-nav{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;margin:2rem 0}
-nav h3{color:var(--accent);margin-bottom:.8rem;font-size:.85rem;letter-spacing:.15em;text-transform:uppercase}
-nav ol{list-style:none;counter-reset:toc;columns:2;column-gap:2rem}
-nav li{counter-increment:toc}
-nav li::before{content:counter(toc) ". ";color:var(--gold)}
-nav a{color:var(--text);font-size:.9rem}nav a:hover{color:var(--accent)}
+.page{display:flex;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 1rem;overflow-y:auto;display:flex;flex-direction:column;gap:1.5rem;z-index:10}
+.sidebar-brand{text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.sidebar-brand .icon{font-size:2rem;margin-bottom:.3rem}
+.sidebar-brand h1{font-size:1rem;letter-spacing:.25em;color:var(--gold);text-shadow:0 0 20px rgba(251,191,36,.3)}
+.sidebar-brand .sub{color:var(--dim);font-size:.65rem;letter-spacing:.05em;margin-top:.3rem;line-height:1.4}
+.sidebar h3{color:var(--accent);margin-bottom:.5rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase}
+.sidebar ol{list-style:none;counter-reset:toc;padding:0}
+.sidebar li{counter-increment:toc;margin:.3rem 0}
+.sidebar li::before{content:counter(toc,decimal-leading-zero) " ";color:var(--gold);font-size:.75rem}
+.sidebar a{color:var(--dim);font-size:.8rem;transition:color .15s}
+.sidebar a:hover,.sidebar a.active{color:var(--accent);text-decoration:none}
+.sidebar-section{padding-top:1rem;border-top:1px solid var(--border)}
+.sidebar-section h3{margin-bottom:.5rem}
+.sidebar-section a{display:block;color:var(--dim);font-size:.8rem;margin:.4rem 0;padding:.3rem .5rem;border-radius:4px;transition:background .15s,color .15s}
+.sidebar-section a:hover{background:rgba(56,189,248,.08);color:var(--accent);text-decoration:none}
+.sidebar-toggle{display:none;position:fixed;top:1rem;left:1rem;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--gold);font-size:1.3rem;padding:.3rem .6rem;cursor:pointer}
+.main{flex:1;min-width:0;padding:2rem 2.5rem;max-width:960px}
+.main header{text-align:center;padding:2rem 0 2rem;border-bottom:1px solid var(--border)}
+.main header h1{font-size:2.4rem;letter-spacing:.3em;color:var(--gold);text-shadow:0 0 30px rgba(251,191,36,.3)}
+.main header .sub{color:var(--dim);margin-top:.5rem;font-size:.95rem;letter-spacing:.1em}
+.main header .doc-type{color:var(--accent);font-size:.8rem;margin-top:1rem;opacity:.7}
 section{margin:2.5rem 0;padding-top:1.5rem;border-top:1px solid var(--border)}
 h2{color:var(--gold);font-size:1.3rem;letter-spacing:.15em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
 h2 .num{color:var(--accent);font-size:.9rem}
@@ -73,21 +84,21 @@ tr:hover td{background:rgba(56,189,248,.03)}
 code{background:rgba(56,189,248,.1);padding:.1rem .4rem;border-radius:3px;font-size:.85rem;color:var(--accent)}
 .notice{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:1rem;margin:2rem 0;font-size:.85rem;color:var(--gold)}
 footer{text-align:center;padding:2rem 0;margin-top:3rem;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem}
-@media(max-width:640px){nav ol{columns:1}.metric-grid{grid-template-columns:1fr}header h1{font-size:1.6rem;letter-spacing:.15em}pre,.diagram{font-size:.7rem;padding:.8rem}}
+@media(max-width:768px){.sidebar{position:fixed;left:-260px;transition:left .3s;width:240px;min-width:240px}.sidebar.open{left:0}.sidebar-toggle{display:block}.main{padding:1.5rem 1rem}.main header h1{font-size:1.6rem;letter-spacing:.15em}.metric-grid{grid-template-columns:1fr}pre,.diagram{font-size:.7rem;padding:.8rem}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+<div class="page">
 
-<header>
-<div style="font-size:3rem;margin-bottom:1rem">&#9889;</div>
+<nav class="sidebar">
+<div class="sidebar-brand">
+<div class="icon">&#9889;</div>
 <h1>LIGHTNING FACTORY</h1>
-<div class="sub">Schumann Resonance Cognitive Enhancement System</div>
-<div class="doc-type">Feasibility Study, Experimental Protocols &amp; Engineering Specifications</div>
-</header>
-
-<nav>
-<h3>Table of Contents</h3>
+<div class="sub">Schumann Resonance<br>Cognitive Enhancement</div>
+</div>
+<div>
+<h3>Contents</h3>
 <ol>
 <li><a href="#exec">Executive Summary</a></li>
 <li><a href="#science">Scientific Foundation</a></li>
@@ -97,7 +108,20 @@ footer{text-align:center;padding:2rem 0;margin-top:3rem;border-top:1px solid var
 <li><a href="#roadmap">Implementation Roadmap</a></li>
 <li><a href="#refs">References</a></li>
 </ol>
+</div>
+<div class="sidebar-section">
+<h3>Directories</h3>
+<a href="grid-brain/">&#9889; Grid Brain</a>
+</div>
 </nav>
+
+<div class="main">
+
+<header>
+<h1>LIGHTNING FACTORY</h1>
+<div class="sub">Schumann Resonance Cognitive Enhancement System</div>
+<div class="doc-type">Feasibility Study, Experimental Protocols &amp; Engineering Specifications</div>
+</header>
 
 <!-- 1. EXECUTIVE SUMMARY -->
 <section id="exec">
@@ -686,6 +710,21 @@ Not a medical device per MDR &mdash; Self-declaration with technical file
 Document version 1.0 &mdash; Prepared for KONOMI Project &mdash; March 2026
 </footer>
 
-</div>
+</div><!-- /main -->
+</div><!-- /page -->
+<script>
+// Close mobile sidebar on nav click
+document.querySelectorAll('.sidebar a').forEach(a=>{
+  a.addEventListener('click',()=>{document.querySelector('.sidebar').classList.remove('open')});
+});
+// Highlight active section on scroll
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.sidebar ol a');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id});
+  navLinks.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+current)});
+},{passive:true});
+</script>
 </body>
 </html>
